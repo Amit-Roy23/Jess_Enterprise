@@ -1,4 +1,12 @@
-import "dotenv/config";
+import dns from "dns";
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch {
+  // Ignore if custom DNS cannot be set
+}
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config();
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import {

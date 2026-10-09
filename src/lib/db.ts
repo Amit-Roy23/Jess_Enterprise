@@ -1,4 +1,11 @@
+import dns from "dns";
 import mongoose from "mongoose";
+
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch {
+  // Ignore in serverless/edge environments where setServers is unavailable
+}
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
