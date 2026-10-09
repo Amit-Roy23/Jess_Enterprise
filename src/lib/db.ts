@@ -3,10 +3,23 @@ import mongoose from "mongoose";
 import { AdminUser, SiteSettings } from "@/models";
 import { runSeed, ensureAdminUser } from "@/lib/seed";
 
-try {
-  dns.setServers(["8.8.8.8", "1.1.1.1"]);
-} catch {
-  // Ignore in serverless/edge environments where setServers is unavailable
+/**
+ * Some ISPs/routers can't resolve the SRV records used by "mongodb+srv://" URIs.
+ * We use the system resolver first (works on Vercel) and only switch to public
+ * DNS servers if that lookup fails.
+ */
+function usePublicDns(): boolean {
+  try {
+    dns.setServers(["8.8.8.8", "1.1.1.1"]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isDnsError(err: unknown): boolean {
+  const msg = err instanceof Error ? `${err.message} ${(err as { code?: string }).code || ""}` : String(err);
+  return /querySrv|queryTxt|ENOTFOUND|ECONNREFUSED.*53|ETIMEOUT|EAI_AGAIN/i.test(msg);
 }
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -44,10 +57,20 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       maxPoolSize: 10,
+      // Fail fast (instead of hanging the page) when the database is unreachable
+      serverSelectionTimeoutMS: 8000,
     };
 
+    const uri = MONGODB_URI;
     cached.promise = mongoose
-      .connect(MONGODB_URI, opts)
+      .connect(uri, opts)
+      .catch(async (err) => {
+        if (uri.startsWith("mongodb+srv://") && isDnsError(err) && usePublicDns()) {
+          console.warn("[db] SRV lookup failed with system DNS, retrying with public DNS...");
+          return mongoose.connect(uri, opts);
+        }
+        throw err;
+      })
       .then(async (mongooseInstance) => {
         await bootstrapDatabase();
         return mongooseInstance;
@@ -74,7 +97,8 @@ async function bootstrapDatabase() {
     const hasSettings = await SiteSettings.exists({});
     if (!hasSettings) {
       console.log("[db] Empty database detected — seeding default content...");
-      await runSeed();
+      // Photos are fetched later (seed script / admin dashboard) to keep this request fast
+      await runSeed({ stockPhotos: false });
       console.log("[db] Default content seeded.");
     } else if (!(await AdminUser.exists({}))) {
       await ensureAdminUser();

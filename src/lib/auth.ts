@@ -1,10 +1,15 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { authConfig } from "@/lib/auth.config";
 import { connectDB } from "@/lib/db";
 import { AdminUser } from "@/models";
 import { loginSchema } from "@/lib/validators";
+
+/** Lets the login page tell "wrong password" apart from "database unreachable". */
+class DatabaseUnavailable extends CredentialsSignin {
+  code = "database";
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -23,7 +28,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const { email, password } = validated.data;
 
-        await connectDB();
+        try {
+          await connectDB();
+        } catch (err) {
+          console.error("[auth] Database unavailable during login:", err);
+          throw new DatabaseUnavailable();
+        }
         const user = await AdminUser.findOne({
           email: email.toLowerCase().trim(),
         });

@@ -17,8 +17,11 @@ import { Product, Enquiry } from "@/models";
 import { auth } from "@/lib/auth";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { Button } from "@/components/ui/button";
+import RestoreCatalogueButton from "@/components/admin/RestoreCatalogueButton";
 
 export const revalidate = 0; // Dynamic dashboard
+// Photo import (server action on this page) may take a while
+export const maxDuration = 60;
 
 export default async function AdminDashboardPage() {
   const session = await auth();
@@ -242,6 +245,8 @@ export default async function AdminDashboardPage() {
             </table>
           </div>
         </div>
+
+        <RestoreCatalogueButton />
 
         {/* Quick Management Links Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

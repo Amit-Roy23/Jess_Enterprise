@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { skipOptimization } from "@/lib/utils";
 import { Wrench, Eye, X, ArrowRight, FileUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,6 +99,7 @@ export function FabricationGallery({ initialItems }: FabricationGalleryProps) {
               {item.images?.[0]?.url ? (
                 <Image
                   src={item.images[0].url}
+                  unoptimized={skipOptimization(item.images[0].url)}
                   alt={item.images[0].alt || item.title}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 25vw"
@@ -174,7 +176,7 @@ export function FabricationGallery({ initialItems }: FabricationGalleryProps) {
                       activeModalItem.images!.length === 1 ? "col-span-2 aspect-[4/3]" : "aspect-square"
                     }`}
                   >
-                    <Image src={img.url} alt={img.alt || activeModalItem.title} fill sizes="300px" className="object-cover" />
+                    <Image src={img.url} unoptimized={skipOptimization(img.url)} alt={img.alt || activeModalItem.title} fill sizes="300px" className="object-cover" />
                   </div>
                 ))}
               </div>
