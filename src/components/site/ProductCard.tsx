@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { skipOptimization } from "@/lib/utils";
 import { Check, Plus, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ export function ProductCard({
           {primaryImage?.url ? (
             <Image
               src={primaryImage.url}
+              unoptimized={skipOptimization(primaryImage.url)}
               alt={primaryImage.alt || name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

@@ -31,7 +31,11 @@ export default function AdminLoginPage() {
         redirect: false,
       });
 
-      if (result?.error) {
+      if (result?.code === "database") {
+        setError(
+          "The server can't connect to the database right now, so login isn't possible. Open /api/health on this site to see why."
+        );
+      } else if (result?.error) {
         setError("Invalid email or password. Please try again.");
       } else {
         router.push(callbackUrl);

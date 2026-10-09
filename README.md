@@ -149,6 +149,20 @@ Default administrator credentials (change the password from **Admin → Users** 
 - **Email:** `jess.enterprises14@gmail.com`
 - **Password:** `Jess@Admin2026`
 
+### Troubleshooting the live site (no products / can't log in)
+1. Open **`https://<your-site>/api/health`**. It shows whether the site can reach MongoDB, how many
+   products/admins it sees, and a plain-English fix if it can't connect.
+2. Most common fix: MongoDB Atlas → **Security → Network Access → Add IP Address → Allow access from anywhere
+   (`0.0.0.0/0`)**. Vercel has no fixed IP, so Atlas blocks it otherwise.
+3. Make sure Vercel's `MONGODB_URI` is **exactly** the one in your `.env.local` (same cluster *and* database
+   name after `.mongodb.net/`), then redeploy. `pnpm seed` prints the database it wrote to.
+4. If `admins` is 0 or the password doesn't work, run `pnpm seed` — it resets the admin password and prints it.
+5. Admin → Dashboard → **"Load products & fetch missing photos"** adds any missing products and downloads
+   photos (stored in Cloudinary when configured) for products without one.
+
+If the database is unreachable, the public site still shows the full built-in catalogue, so visitors never
+see an empty page.
+
 ### Images
 - Built-in product photos live in `public/products/`, client logos in `public/clients/`, the brand logo in `public/brand/`.
 - In the admin panel each product can have up to 6 photos: upload a file (auto-resized to WebP) or paste any image link (e.g. from Google Images).

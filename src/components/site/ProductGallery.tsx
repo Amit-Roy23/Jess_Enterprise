@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, skipOptimization } from "@/lib/utils";
 
 interface ProductGalleryProps {
   images: { url: string; alt?: string }[];
@@ -29,6 +29,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
           >
             <Image
               src={current.url}
+              unoptimized={skipOptimization(current.url)}
               alt={current.alt || name}
               fill
               priority={active === 0}
@@ -52,7 +53,7 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
               )}
               aria-label={`Show photo ${i + 1} of ${name}`}
             >
-              <Image src={img.url} alt="" fill sizes="80px" className="object-contain p-1 mix-blend-multiply" />
+              <Image src={img.url} unoptimized={skipOptimization(img.url)} alt="" fill sizes="80px" className="object-contain p-1 mix-blend-multiply" />
             </button>
           ))}
         </div>

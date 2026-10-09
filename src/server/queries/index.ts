@@ -13,6 +13,17 @@ import {
   type IClient,
   type ISiteSettings,
 } from "@/models";
+import {
+  fallbackCategories,
+  fallbackProducts,
+  fallbackClients,
+  fallbackServices,
+} from "@/lib/catalogue-fallback";
+
+// When MongoDB is unreachable the public site falls back to the built-in catalogue
+// (see /api/health to diagnose the connection).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const asDocs = <T,>(v: unknown) => JSON.parse(JSON.stringify(v)) as any as T;
 
 export async function getSiteSettings(): Promise<Partial<ISiteSettings>> {
   try {
@@ -51,7 +62,7 @@ export async function getCategories(): Promise<ICategory[]> {
     return JSON.parse(JSON.stringify(categories));
   } catch (error) {
     console.error("Error fetching categories:", error);
-    return [];
+    return asDocs<ICategory[]>(fallbackCategories);
   }
 }
 
@@ -100,8 +111,16 @@ export async function getProducts(options?: {
     const products = await productQuery.lean();
     return JSON.parse(JSON.stringify(products));
   } catch (error) {
-    console.error("Error fetching products:", error);
-    return [];
+    console.error("Error fetching products, using built-in catalogue:", error);
+    let list = fallbackProducts;
+    if (options?.featuredOnly) list = list.filter((p) => p.isFeatured);
+    if (options?.categorySlug) list = list.filter((p) => p.category?.slug === options.categorySlug);
+    if (options?.search) {
+      const q = options.search.toLowerCase();
+      list = list.filter((p) => `${p.name} ${p.shortDescription} ${p.description}`.toLowerCase().includes(q));
+    }
+    if (options?.limit) list = list.slice(0, options.limit);
+    return asDocs(list);
   }
 }
 
@@ -116,8 +135,9 @@ export async function getProductBySlug(
     if (!product) return null;
     return JSON.parse(JSON.stringify(product));
   } catch (error) {
-    console.error(`Error fetching product ${slug}:`, error);
-    return null;
+    console.error(`Error fetching product ${slug}, using built-in catalogue:`, error);
+    const fallback = fallbackProducts.find((p) => p.slug === slug);
+    return fallback ? asDocs(fallback) : null;
   }
 }
 
@@ -139,7 +159,11 @@ export async function getRelatedProducts(
     return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Error fetching related products:", error);
-    return [];
+    return asDocs(
+      fallbackProducts
+        .filter((p) => String(p.category?._id) === String(categoryId) && String(p._id) !== String(currentProductId))
+        .slice(0, limit)
+    );
   }
 }
 
@@ -152,7 +176,7 @@ export async function getServices(): Promise<IService[]> {
     return JSON.parse(JSON.stringify(services));
   } catch (error) {
     console.error("Error fetching services:", error);
-    return [];
+    return asDocs<IService[]>(fallbackServices);
   }
 }
 
@@ -164,7 +188,8 @@ export async function getServiceBySlug(slug: string): Promise<IService | null> {
     return JSON.parse(JSON.stringify(service));
   } catch (error) {
     console.error(`Error fetching service ${slug}:`, error);
-    return null;
+    const fallback = fallbackServices.find((sv) => sv.slug === slug);
+    return fallback ? asDocs<IService>(fallback) : null;
   }
 }
 
@@ -177,7 +202,7 @@ export async function getClients(): Promise<IClient[]> {
     return JSON.parse(JSON.stringify(clients));
   } catch (error) {
     console.error("Error fetching clients:", error);
-    return [];
+    return asDocs<IClient[]>(fallbackClients);
   }
 }
 

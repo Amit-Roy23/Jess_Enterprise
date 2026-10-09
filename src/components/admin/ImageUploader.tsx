@@ -118,6 +118,7 @@ export function ImageUploader({
         <div className="relative w-40 h-32 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 group">
           <Image
             src={value}
+            unoptimized
             alt="Uploaded Preview"
             fill
             className="object-cover"

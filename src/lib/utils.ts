@@ -12,3 +12,11 @@ export function formatPhoneNumber(phone: string): string {
   }
   return phone;
 }
+
+/**
+ * Images Next.js should not proxy through its optimizer (Wikimedia rejects
+ * server-side hotlinking); the browser loads them directly instead.
+ */
+export function skipOptimization(url?: string): boolean {
+  return !!url && /(^https?:\/\/)?upload\.wikimedia\.org\//.test(url);
+}
