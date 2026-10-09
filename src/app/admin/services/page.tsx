@@ -36,7 +36,7 @@ export default async function AdminServicesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-2xl font-black text-slate-900 tracking-tight">
           Services & Compliance Offerings

@@ -1,281 +1,133 @@
 import React from "react";
 import Link from "next/link";
-import {
-  Phone,
-  Mail,
-  MapPin,
-  ShieldCheck,
-  Award,
-  CheckCircle2,
-  ExternalLink,
-} from "lucide-react";
+import { Phone, Mail, MapPin, ShieldCheck, Receipt, Factory, ArrowUpRight, Clock } from "lucide-react";
 import Logo from "./Logo";
+import { CONTACT, whatsappLink } from "@/lib/contact";
+
+const SERVICES = [
+  { name: "Legal Metrology Stamping", href: "/services/legal-metrology-stamping" },
+  { name: "Balance AMC & Repairs", href: "/services/balance-amc" },
+  { name: "Certified Standard Weights", href: "/services/calibration-certified-weights" },
+  { name: "Lab Instrument Sales", href: "/products" },
+  { name: "Custom Fabrication", href: "/fabrication" },
+];
+
+const COMPANY = [
+  { name: "About Us", href: "/about" },
+  { name: "Products", href: "/products" },
+  { name: "Our Clients", href: "/clients" },
+  { name: "Request a Quote", href: "/quote" },
+  { name: "Contact", href: "/contact" },
+];
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0f172a] text-slate-300 border-t border-slate-800">
-      {/* Registration & Trust Banner */}
-      <div className="bg-[#13335e] border-b border-slate-800 py-6 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-start gap-3 bg-[#0d2140]/60 p-4 rounded-lg border border-blue-900/50">
-            <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-                Legal Metrology Authorised
-              </h4>
-              <p className="text-xs text-blue-200 mt-1">
-                Govt. Licence No:{" "}
-                <span className="font-mono font-bold text-white">
-                  22000126-CLM
-                </span>
-              </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Stamping, Verification & AMC Services
-              </p>
-            </div>
-          </div>
+    <footer className="relative overflow-hidden bg-[#0b1f3a] text-slate-300 print:hidden">
+      <div className="absolute inset-0 bg-grid-light opacity-60" aria-hidden="true" />
+      <div
+        className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[#1e5aa8]/40 blur-3xl"
+        aria-hidden="true"
+      />
 
-          <div className="flex items-start gap-3 bg-[#0d2140]/60 p-4 rounded-lg border border-blue-900/50">
-            <Award className="w-6 h-6 text-blue-400 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-                GST Registered
-              </h4>
-              <p className="text-xs text-blue-200 mt-1">
-                GSTIN:{" "}
-                <span className="font-mono font-bold text-white">
-                  30AZCPG5317P1ZG
-                </span>
-              </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Compliant B2B Invoicing & E-Way Bills
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 bg-[#0d2140]/60 p-4 rounded-lg border border-blue-900/50">
-            <CheckCircle2 className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-                MSME Udyam Registered
-              </h4>
-              <p className="text-xs text-blue-200 mt-1">
-                Udyam:{" "}
-                <span className="font-mono font-bold text-white">
-                  UDYAM-GA-01-0024091
-                </span>
-              </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Micro Enterprise • Goa, India
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Col 1: About & Info */}
-          <div className="lg:col-span-2 space-y-4">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
+          <div className="lg:col-span-4 space-y-5">
             <Logo variant="footer" size="lg" />
-            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-              Jess Enterprises is a trusted Goa-based supplier of high-precision
-              laboratory instruments, government-authorised Legal Metrology
-              services, and custom engineering fabrication (SS, MS, Acrylic,
-              PVC, Teflon, Polycarbonate).
+            <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
+              A professional company established to deliver the best services to its clients — lab
+              instruments, legal metrology and custom fabrication, all under one roof in Goa.
             </p>
-            <div className="pt-2 text-xs text-slate-400 space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Serving Pharma, Chemical, Research & Industrial Units across Goa</span>
-              </div>
+            <div className="flex flex-wrap gap-2 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 ring-1 ring-white/10">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Lic. 22000126-CLM
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 ring-1 ring-white/10">
+                <Receipt className="h-3.5 w-3.5 text-blue-300" /> GST 30AZCPG5317P1ZG
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 ring-1 ring-white/10">
+                <Factory className="h-3.5 w-3.5 text-amber-300" /> MSME UDYAM-GA-01-0024091
+              </span>
             </div>
           </div>
 
-          {/* Col 2: Verticals */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">
-              Our Verticals
-            </h3>
+          <div className="lg:col-span-3">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Services</h3>
             <ul className="space-y-2.5 text-sm">
-              <li>
-                <Link
-                  href="/services#legal-metrology"
-                  className="hover:text-white transition-colors"
-                >
-                  Legal Metrology Services
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products"
-                  className="hover:text-white transition-colors"
-                >
-                  Lab Instruments & Balances
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/services#amc"
-                  className="hover:text-white transition-colors"
-                >
-                  Balance AMC & Calibration
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/fabrication"
-                  className="hover:text-white transition-colors"
-                >
-                  Custom Fabrication Works
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products?category=weights-calibration"
-                  className="hover:text-white transition-colors"
-                >
-                  E1, E2, F1, F2 Certified Weights
-                </Link>
-              </li>
+              {SERVICES.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="group inline-flex items-center gap-1 hover:text-white transition-colors">
+                    {l.name}
+                    <ArrowUpRight className="h-3 w-3 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Col 3: Quick Links */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">
-              Navigation
-            </h3>
+          <div className="lg:col-span-2">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Company</h3>
             <ul className="space-y-2.5 text-sm">
-              <li>
-                <Link href="/about" className="hover:text-white transition-colors">
-                  About Our Company
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products"
-                  className="hover:text-white transition-colors"
-                >
-                  Product Catalogue
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/services"
-                  className="hover:text-white transition-colors"
-                >
-                  Service Offerings
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/fabrication"
-                  className="hover:text-white transition-colors"
-                >
-                  Fabrication Portfolio
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/clients"
-                  className="hover:text-white transition-colors"
-                >
-                  Trusted Clients
-                </Link>
-              </li>
-              <li>
-                <Link href="/quote" className="hover:text-white transition-colors">
-                  Request a Quote Basket
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-white transition-colors"
-                >
-                  Contact & Support
-                </Link>
-              </li>
+              {COMPANY.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="hover:text-white transition-colors">
+                    {l.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Col 4: Contact Info */}
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">
-              Contact Us
-            </h3>
-            <div className="space-y-3 text-sm">
-              <div>
-                <p className="text-xs text-slate-400">Mobile / WhatsApp:</p>
-                <a
-                  href="tel:9158391519"
-                  className="text-white hover:text-blue-300 font-semibold flex items-center gap-1.5 mt-0.5"
-                >
-                  <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                  +91 91583 91519
+          <div className="lg:col-span-3">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-white mb-4">Get in touch</h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <a href={`tel:${CONTACT.office}`} className="flex items-start gap-3 hover:text-white transition-colors">
+                  <Phone className="h-4 w-4 mt-0.5 text-blue-300 shrink-0" />
+                  <span>
+                    +91 92259 01519 <span className="text-slate-500">(Office)</span>
+                  </span>
                 </a>
-              </div>
-
-              <div>
-                <p className="text-xs text-slate-400">Office Phone:</p>
-                <a
-                  href="tel:9225901519"
-                  className="text-white hover:text-blue-300 font-semibold flex items-center gap-1.5 mt-0.5"
-                >
-                  <Phone className="w-3.5 h-3.5 text-blue-400" />
-                  +91 92259 01519
+              </li>
+              <li>
+                <a href={`tel:${CONTACT.mobile}`} className="flex items-start gap-3 hover:text-white transition-colors">
+                  <Phone className="h-4 w-4 mt-0.5 text-blue-300 shrink-0" />
+                  <span>+91 91583 91519</span>
                 </a>
-              </div>
-
-              <div>
-                <p className="text-xs text-slate-400">Email Address:</p>
-                <a
-                  href="mailto:jess.enterprises14@gmail.com"
-                  className="text-white hover:text-blue-300 break-all flex items-center gap-1.5 mt-0.5"
-                >
-                  <Mail className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                  jess.enterprises14@gmail.com
+              </li>
+              <li>
+                <a href={`mailto:${CONTACT.email}`} className="flex items-start gap-3 hover:text-white transition-colors break-all">
+                  <Mail className="h-4 w-4 mt-0.5 text-blue-300 shrink-0" />
+                  <span>{CONTACT.email}</span>
                 </a>
-              </div>
-
-              <div className="pt-1">
-                <p className="text-xs text-slate-400">Location:</p>
-                <p className="text-white flex items-center gap-1.5 mt-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                  Goa, India
-                </p>
-              </div>
-            </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 mt-0.5 text-red-400 shrink-0" />
+                <span>Goa, India</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Clock className="h-4 w-4 mt-0.5 text-blue-300 shrink-0" />
+                <span>Mon – Sat: 9:00 AM – 6:30 PM</span>
+              </li>
+            </ul>
+            <a
+              href={whatsappLink("Hello Jess Enterprises, I would like to enquire about your products and services.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2 text-sm font-bold text-white shadow-lg shadow-emerald-900/30 transition-transform hover:-translate-y-0.5"
+            >
+              WhatsApp us
+            </a>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>
-            © {currentYear} Jess Enterprises. All rights reserved. Innovative
-            Services.
-          </p>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/privacy"
-              className="hover:text-slate-300 transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-slate-300 transition-colors">
-              Terms of Service
-            </Link>
-            <Link
-              href="/admin/login"
-              className="hover:text-slate-300 text-slate-500 transition-colors flex items-center gap-1"
-            >
-              <span>Admin</span>
-              <ExternalLink className="w-3 h-3" />
-            </Link>
+        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <p>© {year} Jess Enterprises, Goa. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-slate-300">Privacy</Link>
+            <Link href="/terms" className="hover:text-slate-300">Terms</Link>
+            <Link href="/admin/login" className="hover:text-slate-300">Admin</Link>
           </div>
         </div>
       </div>

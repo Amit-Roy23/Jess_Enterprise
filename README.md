@@ -11,8 +11,8 @@ Production-grade business website, product catalogue, quotation engine, and admi
 - **Location:** Goa, India
 - **Primary Email:** `jess.enterprises14@gmail.com`
 - **Phone Numbers:**
-  - Mobile / WhatsApp: `+91 9158391519`
-  - Office Landline: `+91 9225901519`
+  - Office / WhatsApp: `+91 9225901519`
+  - Mobile: `+91 9158391519`
 - **Official Compliance Registrations:**
   - **Legal Metrology Licence No.:** `22000126-CLM` (Government Authorised)
   - **GSTIN:** `30AZCPG5317P1ZG`
@@ -133,15 +133,30 @@ AUTH_SECRET=a_random_32_character_string_for_nextauth
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### Step 3: Seed the Database
-Run the idempotent seed script to populate all 33 instruments, 18 clients, 5 services, 6 categories, and initial admin credentials:
+### Step 3: Seed the Database (automatic)
+On an **empty** database the site seeds itself on the first request: 33 instruments (with photos),
+18 client logos, 5 services, 6 categories, site settings and the admin account. Nothing is
+overwritten once data exists.
+
+You can also run the seed manually at any time. It only adds what is missing (photos are added to
+products that have none, logos to clients that have none) and it **resets the admin password**
+to `INITIAL_ADMIN_PASSWORD` (or the default below):
 ```bash
 pnpm run seed
 ```
 
-Default seeded administrator credentials:
+Default administrator credentials (change the password from **Admin → Users** after first login):
 - **Email:** `jess.enterprises14@gmail.com`
-- **Password:** `ChangeThisPassword123!`
+- **Password:** `Jess@Admin2026`
+
+### Images
+- Built-in product photos live in `public/products/`, client logos in `public/clients/`, the brand logo in `public/brand/`.
+- In the admin panel each product can have up to 6 photos: upload a file (auto-resized to WebP) or paste any image link (e.g. from Google Images).
+- Uploads go to Cloudinary when its env vars are set; otherwise they are stored in MongoDB and served from `/api/media/<id>` with long-lived caching.
+
+### WhatsApp
+The floating WhatsApp button opens a chat with **+91 92259 01519** (office). The message is pre-filled with the
+product or service the visitor is viewing. Change the number in `src/lib/contact.ts`.
 
 ### Step 4: Start Development Server
 ```bash

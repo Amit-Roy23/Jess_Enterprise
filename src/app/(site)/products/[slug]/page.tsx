@@ -2,7 +2,6 @@ import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ChevronRight,
   ShieldCheck,
@@ -19,9 +18,15 @@ import { Button } from "@/components/ui/button";
 import ProductPlaceholder from "@/components/site/ProductPlaceholder";
 import AddToQuoteButton from "@/components/site/AddToQuoteButton";
 import ProductCard from "@/components/site/ProductCard";
+import ProductGallery from "@/components/site/ProductGallery";
 import { getProductBySlug, getRelatedProducts } from "@/server/queries";
 
 export const revalidate = 60;
+
+// Pages are rendered on first visit, then served from cache (ISR)
+export async function generateStaticParams() {
+  return [];
+}
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -130,23 +135,16 @@ export default async function ProductDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left: Product Image / Visual Container (5 Cols) */}
           <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-            <div className="aspect-[4/3] w-full relative bg-slate-50">
-              {primaryImage?.url ? (
-                <Image
-                  src={primaryImage.url}
-                  alt={primaryImage.alt || product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 500px"
-                  className="object-cover"
-                />
-              ) : (
+            {product.images?.length ? (
+              <ProductGallery images={product.images} name={product.name} />
+            ) : (
+              <div className="aspect-[4/3] w-full relative bg-slate-50">
                 <ProductPlaceholder
                   categorySlug={product.category?.slug}
                   name={product.name}
                 />
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Statutory Compliance Footer Banner */}
             <div className="p-4 bg-blue-50/50 border-t border-slate-100 flex items-center gap-3 text-xs text-slate-700">

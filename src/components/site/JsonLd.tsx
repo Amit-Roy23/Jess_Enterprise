@@ -13,8 +13,8 @@ export function OrganizationJsonLd({ url = "https://jessenterprises.in" }: Organ
     description:
       "Government Authorised Legal Metrology Service Provider, Laboratory Instruments Supplier, and Cleanroom Custom Fabrication Workshop.",
     url,
-    logo: `${url}/logo.png`,
-    image: `${url}/og-image.jpg`,
+    logo: `${url}/brand/jess-logo-512.png`,
+    image: `${url}/brand/jess-logo-512.png`,
     telephone: ["+91-9158391519", "+91-9225901519"],
     email: "jess.enterprises14@gmail.com",
     address: {
@@ -97,7 +97,7 @@ export function ProductJsonLd({
     name,
     description:
       description || `${name} supplied and calibrated by Jess Enterprises.`,
-    image: image || `${baseUrl}/og-image.jpg`,
+    image: image || `${baseUrl}/brand/jess-logo-512.png`,
     category,
     url: `${baseUrl}/products/${slug}`,
     brand: {

@@ -18,3 +18,4 @@ export {
 } from "./Enquiry";
 export { SiteSettings, type ISiteSettings } from "./SiteSettings";
 export { AdminUser, type IAdminUser } from "./AdminUser";
+export { Media, type IMedia } from "./Media";

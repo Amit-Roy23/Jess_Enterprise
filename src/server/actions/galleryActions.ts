@@ -19,7 +19,7 @@ export async function createGalleryItemAction(data: GalleryItemInput) {
     await connectDB();
     await GalleryItem.create(validated.data);
     revalidatePath("/fabrication");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Gallery item created successfully" };
   } catch (err) {
     console.error("Error creating gallery item:", err);
@@ -32,10 +32,14 @@ export async function updateGalleryItemAction(id: string, data: Partial<GalleryI
     const session = await auth();
     if (!session?.user) return { success: false, message: "Unauthorized" };
 
+    const validated = galleryItemSchema.partial().safeParse(data);
+    if (!validated.success) {
+      return { success: false, message: "Validation failed", errors: validated.error.flatten().fieldErrors };
+    }
     await connectDB();
-    await GalleryItem.findByIdAndUpdate(id, data);
+    await GalleryItem.findByIdAndUpdate(id, validated.data, { runValidators: true });
     revalidatePath("/fabrication");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Gallery item updated successfully" };
   } catch (err) {
     console.error("Error updating gallery item:", err);
@@ -51,7 +55,7 @@ export async function deleteGalleryItemAction(id: string) {
     await connectDB();
     await GalleryItem.findByIdAndDelete(id);
     revalidatePath("/fabrication");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Gallery item deleted successfully" };
   } catch (err) {
     console.error("Error deleting gallery item:", err);

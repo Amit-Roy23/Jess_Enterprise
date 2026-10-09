@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -8,61 +9,59 @@ interface LogoProps {
   size?: "sm" | "md" | "lg";
 }
 
+const SIZES = {
+  sm: { mark: 40, text: "text-[1.9rem]", tag: "text-[9px]" },
+  md: { mark: 50, text: "text-[2.35rem]", tag: "text-[10px]" },
+  lg: { mark: 64, text: "text-[2.9rem]", tag: "text-[11px]" },
+};
+
 export function Logo({ className, variant = "default", size = "md" }: LogoProps) {
   const isLight = variant === "light" || variant === "footer";
-
-  const sizeClasses = {
-    sm: "text-lg",
-    md: "text-xl",
-    lg: "text-2xl",
-  };
-
-  const markSizes = {
-    sm: "w-8 h-8 text-sm",
-    md: "w-10 h-10 text-base",
-    lg: "w-12 h-12 text-lg",
-  };
+  const s = SIZES[size];
 
   return (
     <Link
       href="/"
-      className={cn("inline-flex items-center gap-3 group select-none", className)}
+      className={cn("inline-flex items-center gap-2.5 group select-none", className)}
       aria-label="Jess Enterprises - Home"
     >
-      {/* jE Mark */}
-      <div
+      <span
         className={cn(
-          "rounded-lg font-black flex items-center justify-center tracking-tighter shadow-sm transition-transform group-hover:scale-105",
-          markSizes[size],
-          isLight
-            ? "bg-white text-[#1e5aa8] border border-white/20"
-            : "bg-[#1e5aa8] text-white"
+          "relative shrink-0 rounded-full bg-white transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-105",
+          isLight ? "ring-2 ring-white/30 shadow-lg shadow-black/20" : "shadow-md shadow-blue-900/10 ring-1 ring-slate-200"
         )}
+        style={{ width: s.mark, height: s.mark }}
       >
-        <span className="font-extrabold">j</span>
-        <span className="font-black text-[#dc2626]">E</span>
-      </div>
+        <Image
+          src="/brand/jess-logo-256.png"
+          alt="Jess Enterprises logo"
+          width={s.mark}
+          height={s.mark}
+          priority
+          className="rounded-full"
+        />
+      </span>
 
-      {/* Typography */}
-      <div className="flex flex-col">
+      <span className="flex flex-col leading-none">
         <span
           className={cn(
-            "font-extrabold tracking-tight leading-none uppercase",
-            sizeClasses[size],
-            isLight ? "text-white" : "text-slate-900"
+            "font-script font-bold whitespace-nowrap -mb-0.5",
+            s.text,
+            isLight ? "text-white" : "text-[#1e5aa8]"
           )}
         >
           Jess Enterprises
         </span>
         <span
           className={cn(
-            "text-[10px] sm:text-xs font-semibold tracking-widest uppercase mt-0.5",
-            isLight ? "text-blue-200" : "text-[#1e5aa8]"
+            "font-semibold tracking-[0.28em] uppercase pl-0.5",
+            s.tag,
+            isLight ? "text-blue-200" : "text-[#dc2626]"
           )}
         >
           Innovative Services
         </span>
-      </div>
+      </span>
     </Link>
   );
 }

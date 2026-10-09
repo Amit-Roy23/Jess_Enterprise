@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { tangerine, jakarta } from "@/lib/fonts";
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in";
 
@@ -40,19 +41,19 @@ export const metadata: Metadata = {
     siteName: "Jess Enterprises",
     images: [
       {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
+        url: "/brand/jess-logo-512.png",
+        width: 512,
+        height: 512,
         alt: "Jess Enterprises — Innovative Services",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Jess Enterprises | Lab Instruments & Legal Metrology Services",
     description:
       "Authorised Legal Metrology service provider, precision lab equipment supplier, and cleanroom custom fabrication in Goa.",
-    images: ["/og-image.jpg"],
+    images: ["/brand/jess-logo-512.png"],
   },
   robots: {
     index: true,
@@ -73,7 +74,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`h-full ${jakarta.variable} ${tangerine.variable}`}>
       <body className="flex min-h-full flex-col bg-slate-50 text-slate-900 antialiased selection:bg-[#1e5aa8] selection:text-white">
         {children}
       </body>

@@ -79,7 +79,8 @@ export async function getProducts(options?: {
     }
 
     if (options?.search) {
-      const searchRegex = new RegExp(options.search, "i");
+      const escaped = options.search.trim().slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const searchRegex = new RegExp(escaped, "i");
       query.$or = [
         { name: searchRegex },
         { shortDescription: searchRegex },

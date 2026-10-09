@@ -58,7 +58,7 @@ export function ProductForm({
     specs: initialData?.specs || [{ label: "", value: "" }],
     features: initialData?.features || [""],
     applications: initialData?.applications || [""],
-    images: initialData?.images || [{ url: "", alt: "" }],
+    images: initialData?.images?.length ? initialData.images : [{ url: "", alt: "" }],
     isFeatured: initialData?.isFeatured ?? false,
     isActive: initialData?.isActive ?? true,
     needsReview: initialData?.needsReview ?? false,
@@ -341,16 +341,44 @@ export function ProductForm({
           2. Product Image & Visibility Status
         </h2>
 
-        <ImageUploader
-          value={formData.images[0]?.url || ""}
-          onChange={(url) =>
-            setFormData({
-              ...formData,
-              images: [{ url, alt: formData.name }],
-            })
-          }
-          label="Primary Product Photo"
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {formData.images.map((img, idx) => (
+            <div key={idx} className="relative">
+              <ImageUploader
+                value={img.url || ""}
+                onChange={(url) => {
+                  const images = [...formData.images];
+                  images[idx] = { url, alt: formData.name };
+                  setFormData({ ...formData, images });
+                }}
+                label={idx === 0 ? "Main Product Photo" : `Extra Photo ${idx}`}
+              />
+              {idx > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFormData({ ...formData, images: formData.images.filter((_, i) => i !== idx) })
+                  }
+                  className="absolute top-0 right-0 text-[11px] font-semibold text-red-600 hover:underline"
+                >
+                  Remove slot
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        {formData.images.length < 6 && (
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, images: [...formData.images, { url: "", alt: "" }] })}
+            className="text-xs font-bold text-[#1e5aa8] hover:underline"
+          >
+            + Add another photo
+          </button>
+        )}
+        <p className="text-[11px] text-slate-500">
+          Tip: upload a photo, or right-click any image on Google Images → &quot;Copy image address&quot; and paste the link.
+        </p>
 
         <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">

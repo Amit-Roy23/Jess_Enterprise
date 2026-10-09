@@ -40,7 +40,7 @@ export function AddToQuoteButton({
   const whatsappMessage = encodeURIComponent(
     `Hello Jess Enterprises, I would like to request quotation details for: ${productName} (Quantity: ${quantity}).`
   );
-  const whatsappUrl = `https://wa.me/919158391519?text=${whatsappMessage}`;
+  const whatsappUrl = `https://wa.me/919225901519?text=${whatsappMessage}`;
 
   return (
     <div className="space-y-4 pt-4 border-t border-slate-200">

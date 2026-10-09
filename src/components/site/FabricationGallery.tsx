@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Wrench, Eye, X, ArrowRight, FileUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,9 +95,19 @@ export function FabricationGallery({ initialItems }: FabricationGalleryProps) {
                   backgroundSize: "16px 16px",
                 }}
               />
-              <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Wrench className="w-7 h-7 text-[#1e5aa8]" />
-              </div>
+              {item.images?.[0]?.url ? (
+                <Image
+                  src={item.images[0].url}
+                  alt={item.images[0].alt || item.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 25vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              ) : (
+                <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Wrench className="w-7 h-7 text-[#1e5aa8]" />
+                </div>
+              )}
               <div className="absolute top-3 left-3">
                 <span
                   className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold border ${getMaterialColor(
@@ -138,8 +149,8 @@ export function FabricationGallery({ initialItems }: FabricationGalleryProps) {
 
       {/* Lightbox / Modal */}
       {activeModalItem && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-200 space-y-4">
+        <div onClick={() => setActiveModalItem(null)} className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div onClick={(e) => e.stopPropagation()} className="max-h-[90vh] overflow-y-auto bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-200 space-y-4">
             <button
               onClick={() => setActiveModalItem(null)}
               className="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
@@ -153,6 +164,21 @@ export function FabricationGallery({ initialItems }: FabricationGalleryProps) {
                 {activeModalItem.material} Fabrication
               </Badge>
             </div>
+
+            {activeModalItem.images && activeModalItem.images.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {activeModalItem.images.slice(0, 4).map((img, i) => (
+                  <div
+                    key={img.url + i}
+                    className={`relative overflow-hidden rounded-xl bg-slate-100 ${
+                      activeModalItem.images!.length === 1 ? "col-span-2 aspect-[4/3]" : "aspect-square"
+                    }`}
+                  >
+                    <Image src={img.url} alt={img.alt || activeModalItem.title} fill sizes="300px" className="object-cover" />
+                  </div>
+                ))}
+              </div>
+            )}
 
             <h3 className="text-xl font-bold text-slate-900 leading-snug">
               {activeModalItem.title}
@@ -170,7 +196,7 @@ export function FabricationGallery({ initialItems }: FabricationGalleryProps) {
                 </Button>
               </Link>
               <a
-                href={`https://wa.me/919158391519?text=${encodeURIComponent(
+                href={`https://wa.me/919225901519?text=${encodeURIComponent(
                   `Hello Jess Enterprises, I would like custom fabrication for: ${activeModalItem.title} (${activeModalItem.material})`
                 )}`}
                 target="_blank"

@@ -12,6 +12,27 @@ interface ImageUploaderProps {
   label?: string;
 }
 
+/** Shrinks large photos in the browser (max 1600px, WebP) so pages stay fast. */
+async function downscaleImage(file: File, maxSize = 1600): Promise<File> {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size < 500 * 1024) return file;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/webp", 0.85)
+    );
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.\w+$/, "") + ".webp", { type: "image/webp" });
+  } catch {
+    return file;
+  }
+}
+
 export function ImageUploader({
   value,
   onChange,
@@ -24,51 +45,55 @@ export function ImageUploader({
   const [error, setError] = useState("");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const original = e.target.files?.[0];
+    e.target.value = "";
+    if (!original) return;
 
     setError("");
     setUploading(true);
 
     try {
-      // 1. Get upload signature from backend
+      const file = await downscaleImage(original);
+
+      // Use Cloudinary when it is configured, otherwise store the image in MongoDB
       const signRes = await fetch("/api/uploads/sign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ folder }),
       });
-
       if (!signRes.ok) {
         throw new Error("Failed to authenticate upload request.");
       }
+      const sign = await signRes.json();
 
-      const { signature, timestamp, apiKey, cloudName } = await signRes.json();
+      if (sign.enabled) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", sign.apiKey);
+        formData.append("timestamp", sign.timestamp.toString());
+        formData.append("signature", sign.signature);
+        formData.append("folder", folder);
 
-      // 2. Upload file directly to Cloudinary
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", apiKey);
-      formData.append("timestamp", timestamp.toString());
-      formData.append("signature", signature);
-      formData.append("folder", folder);
-
-      const uploadRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!uploadRes.ok) {
-        throw new Error("Cloudinary upload failed.");
+        const uploadRes = await fetch(
+          `https://api.cloudinary.com/v1_1/${sign.cloudName}/image/upload`,
+          { method: "POST", body: formData }
+        );
+        if (!uploadRes.ok) throw new Error("Cloudinary upload failed.");
+        const uploadData = await uploadRes.json();
+        onChange(uploadData.secure_url);
+      } else {
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadRes = await fetch("/api/uploads", { method: "POST", body: formData });
+        const uploadData = await uploadRes.json().catch(() => ({}));
+        if (!uploadRes.ok) throw new Error(uploadData.error || "Upload failed.");
+        onChange(uploadData.url);
       }
-
-      const uploadData = await uploadRes.json();
-      onChange(uploadData.secure_url);
     } catch (err) {
       console.error("Upload error:", err);
-      setError("Upload failed. You can paste an image URL directly instead.");
+      setError(
+        `${err instanceof Error ? err.message : "Upload failed."} You can paste an image URL instead.`
+      );
       setShowManualInput(true);
     } finally {
       setUploading(false);
@@ -113,7 +138,7 @@ export function ImageUploader({
               {uploading ? (
                 <div className="flex items-center gap-2 text-[#1e5aa8] font-semibold">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Uploading to Cloudinary...</span>
+                  <span>Uploading...</span>
                 </div>
               ) : (
                 <>
@@ -122,7 +147,7 @@ export function ImageUploader({
                     Click to browse photo
                   </p>
                   <p className="text-[10px] text-slate-400 mt-0.5">
-                    PNG, JPG, WebP up to 5MB
+                    PNG, JPG or WebP — auto-optimised
                   </p>
                 </>
               )}
@@ -151,7 +176,7 @@ export function ImageUploader({
             <div className="flex items-center gap-2 pt-1 animate-in fade-in duration-200">
               <input
                 type="url"
-                placeholder="https://images.unsplash.com/..."
+                placeholder="Paste image link (e.g. from Google Images)"
                 value={manualUrl}
                 onChange={(e) => setManualUrl(e.target.value)}
                 className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-slate-200 bg-white"

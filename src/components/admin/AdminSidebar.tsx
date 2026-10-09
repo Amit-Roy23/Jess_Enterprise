@@ -39,10 +39,10 @@ export function AdminSidebar() {
     <aside className="w-64 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 border-r border-slate-800 min-h-screen">
       <div>
         {/* Brand Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-5 border-b border-slate-800 space-y-2">
           <Logo variant="footer" size="sm" />
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#1e5aa8] text-white">
-            ADMIN
+          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold tracking-widest bg-[#1e5aa8] text-white">
+            ADMIN PANEL
           </span>
         </div>
 

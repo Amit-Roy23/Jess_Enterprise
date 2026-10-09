@@ -153,7 +153,7 @@ export function QuoteBasketView() {
             <Button variant="primary">Browse More Instruments</Button>
           </Link>
           <a
-            href={`https://wa.me/919158391519?text=${encodeURIComponent(
+            href={`https://wa.me/919225901519?text=${encodeURIComponent(
               `Hello Jess Enterprises, I just submitted a quote request for ${totalItemsCount} items under the name: ${formData.name}`
             )}`}
             target="_blank"

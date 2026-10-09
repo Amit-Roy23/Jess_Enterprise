@@ -61,7 +61,7 @@ export default function Error({
         <div className="pt-4 border-t border-slate-100 text-[11px] text-slate-400">
           Need immediate support? WhatsApp us at{" "}
           <a
-            href="https://wa.me/919158391519"
+            href="https://wa.me/919225901519"
             target="_blank"
             rel="noopener noreferrer"
             className="font-bold text-[#1e5aa8] hover:underline inline-flex items-center gap-1"
