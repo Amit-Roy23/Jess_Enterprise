@@ -19,7 +19,7 @@ export async function createServiceAction(data: ServiceInput) {
     await connectDB();
     await Service.create(validated.data);
     revalidatePath("/services");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Service created successfully" };
   } catch (err) {
     console.error("Error creating service:", err);
@@ -32,10 +32,14 @@ export async function updateServiceAction(id: string, data: Partial<ServiceInput
     const session = await auth();
     if (!session?.user) return { success: false, message: "Unauthorized" };
 
+    const validated = serviceSchema.partial().safeParse(data);
+    if (!validated.success) {
+      return { success: false, message: "Validation failed", errors: validated.error.flatten().fieldErrors };
+    }
     await connectDB();
-    await Service.findByIdAndUpdate(id, data);
+    await Service.findByIdAndUpdate(id, validated.data, { runValidators: true });
     revalidatePath("/services");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Service updated successfully" };
   } catch (err) {
     console.error("Error updating service:", err);
@@ -51,7 +55,7 @@ export async function deleteServiceAction(id: string) {
     await connectDB();
     await Service.findByIdAndDelete(id);
     revalidatePath("/services");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Service deleted successfully" };
   } catch (err) {
     console.error("Error deleting service:", err);

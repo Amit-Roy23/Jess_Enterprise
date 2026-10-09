@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Phone,
   Mail,
@@ -15,9 +16,9 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Logo from "./Logo";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { CONTACT } from "@/lib/contact";
+import { getQuoteBasket } from "@/lib/quote-store";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -25,241 +26,195 @@ const NAV_LINKS = [
   { name: "Services", href: "/services" },
   { name: "Fabrication", href: "/fabrication" },
   { name: "Clients", href: "/clients" },
-  { name: "About Us", href: "/about" },
+  { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quoteCount, setQuoteCount] = useState(0);
-  const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname() || "/";
 
-  // Load quote basket count from localStorage safely
   useEffect(() => {
-    const updateBasketCount = () => {
-      try {
-        const basket = localStorage.getItem("jess_quote_basket");
-        if (basket) {
-          const items = JSON.parse(basket);
-          if (Array.isArray(items)) {
-            const count = items.reduce(
-              (acc: number, item: { quantity?: number }) =>
-                acc + (item.quantity || 1),
-              0
-            );
-            setQuoteCount(count);
-          }
-        } else {
-          setQuoteCount(0);
-        }
-      } catch {
-        setQuoteCount(0);
-      }
-    };
-
-    updateBasketCount();
-    window.addEventListener("storage", updateBasketCount);
-    window.addEventListener("basket-updated", updateBasketCount);
-
+    const update = () =>
+      setQuoteCount(getQuoteBasket().reduce((acc, item) => acc + (item.quantity || 1), 0));
+    update();
+    window.addEventListener("storage", update);
+    window.addEventListener("basket-updated", update);
     return () => {
-      window.removeEventListener("storage", updateBasketCount);
-      window.removeEventListener("basket-updated", updateBasketCount);
+      window.removeEventListener("storage", update);
+      window.removeEventListener("basket-updated", update);
     };
-  }, [pathname]);
+  }, []);
 
-  // Close mobile menu on route change
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
-      {/* Top Announcement Bar */}
-      <div className="bg-[#13335e] text-slate-100 text-xs py-2 px-4 border-b border-[#1e5aa8]/30">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-4">
-          {/* Compliance & Licence */}
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 font-semibold text-blue-200">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              Govt. Authorised Legal Metrology
-            </span>
-            <span className="hidden sm:inline text-slate-400">•</span>
-            <span className="hidden sm:inline text-slate-300">
-              Licence: <span className="font-mono text-white">22000126-CLM</span>
-            </span>
-          </div>
-
-          {/* Contact Direct */}
-          <div className="flex items-center gap-4 text-xs">
-            <a
-              href="tel:9158391519"
-              className="flex items-center gap-1.5 text-slate-200 hover:text-white transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-blue-400" />
-              <span className="font-medium">+91 91583 91519</span>
+    <header className="sticky top-0 z-40 w-full print:hidden">
+      {/* Top contact bar */}
+      <div
+        className={cn(
+          "bg-[#0b1f3a] text-slate-200 text-xs overflow-hidden transition-all duration-300",
+          scrolled ? "max-h-0" : "max-h-12"
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <span className="inline-flex items-center gap-1.5 font-medium text-blue-100">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            Govt. Authorised Legal Metrology
+            <span className="hidden sm:inline text-slate-400">· Lic. No. 22000126-CLM</span>
+          </span>
+          <div className="flex items-center gap-4">
+            <a href={`tel:${CONTACT.office}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <Phone className="w-3.5 h-3.5 text-blue-300" />
+              <span className="font-semibold">+91 92259 01519</span>
             </a>
-            <a
-              href="mailto:jess.enterprises14@gmail.com"
-              className="hidden md:flex items-center gap-1.5 text-slate-200 hover:text-white transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 text-blue-400" />
-              <span>jess.enterprises14@gmail.com</span>
+            <a href={`tel:${CONTACT.mobile}`} className="hidden md:flex items-center gap-1.5 hover:text-white transition-colors">
+              <Phone className="w-3.5 h-3.5 text-blue-300" />
+              <span>+91 91583 91519</span>
             </a>
-            <span className="hidden lg:flex items-center gap-1 text-slate-300">
+            <a href={`mailto:${CONTACT.email}`} className="hidden lg:flex items-center gap-1.5 hover:text-white transition-colors">
+              <Mail className="w-3.5 h-3.5 text-blue-300" />
+              <span>{CONTACT.email}</span>
+            </a>
+            <span className="hidden xl:flex items-center gap-1 text-slate-300">
               <MapPin className="w-3.5 h-3.5 text-red-400" />
-              <span>Goa, India</span>
+              Goa, India
             </span>
           </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Logo />
+      {/* Main navbar */}
+      <div
+        className={cn(
+          "border-b transition-all duration-300",
+          scrolled
+            ? "bg-white/85 backdrop-blur-xl border-slate-200/80 shadow-[0_8px_30px_rgb(15_23_42/0.06)]"
+            : "bg-white border-transparent"
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-20")}>
+            <Logo size={scrolled ? "sm" : "md"} />
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-            {NAV_LINKS.map((link) => {
-              const isActive =
-                link.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(link.href);
-              return (
+            <nav className="hidden lg:flex items-center gap-1" aria-label="Main">
+              {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "px-3 py-2 rounded-md text-sm font-semibold transition-colors",
-                    isActive
-                      ? "text-[#1e5aa8] bg-blue-50/80 font-bold"
-                      : "text-slate-700 hover:text-[#1e5aa8] hover:bg-slate-50"
+                    "relative px-3.5 py-2 rounded-full text-sm font-semibold transition-colors",
+                    isActive(link.href) ? "text-[#1e5aa8]" : "text-slate-600 hover:text-[#1e5aa8]"
                   )}
                 >
-                  {link.name}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Actions: Quote Basket & CTA */}
-          <div className="hidden sm:flex items-center gap-3">
-            <Link
-              href="/quote"
-              className="relative p-2 text-slate-700 hover:text-[#1e5aa8] hover:bg-blue-50 rounded-lg transition-colors"
-              aria-label="Quote Basket"
-            >
-              <FileText className="w-5 h-5" />
-              {quoteCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#dc2626] text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-xs">
-                  {quoteCount}
-                </span>
-              )}
-            </Link>
-
-            <Link href="/quote">
-              <Button variant="primary" size="default" className="gap-2 font-semibold">
-                <span>Request a Quote</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-
-          {/* Mobile Menu Toggle Button */}
-          <div className="flex items-center gap-2 lg:hidden">
-            <Link
-              href="/quote"
-              className="relative p-2 text-slate-700 hover:text-[#1e5aa8] rounded-lg"
-              aria-label="Quote Basket"
-            >
-              <FileText className="w-5 h-5" />
-              {quoteCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#dc2626] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                  {quoteCount}
-                </span>
-              )}
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-slate-700 hover:text-slate-900 hover:bg-slate-100 focus:outline-none"
-              aria-label="Toggle navigation menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2 duration-200">
-          <div className="flex flex-col space-y-1">
-            {NAV_LINKS.map((link) => {
-              const isActive =
-                link.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(link.href);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "flex items-center justify-between px-3 py-2.5 rounded-lg text-base font-semibold",
-                    isActive
-                      ? "bg-blue-50 text-[#1e5aa8] font-bold"
-                      : "text-slate-800 hover:bg-slate-50"
+                  {isActive(link.href) && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      className="absolute inset-0 rounded-full bg-blue-50 ring-1 ring-blue-100"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
                   )}
-                >
-                  <span>{link.name}</span>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <span className="relative">{link.name}</span>
                 </Link>
-              );
-            })}
-          </div>
+              ))}
+            </nav>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col gap-3">
-            <Link
-              href="/quote"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full"
-            >
-              <Button variant="primary" className="w-full justify-center gap-2">
-                <FileText className="w-4 h-4" />
-                <span>Request a Quote ({quoteCount} items)</span>
-              </Button>
-            </Link>
-
-            <a href="tel:9158391519" className="w-full">
-              <Button
-                variant="outline"
-                className="w-full justify-center gap-2 border-slate-300"
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/quote"
+                className="relative p-2.5 text-slate-700 hover:text-[#1e5aa8] hover:bg-blue-50 rounded-full transition-colors"
+                aria-label={`Quote basket (${quoteCount} items)`}
               >
-                <Phone className="w-4 h-4 text-[#1e5aa8]" />
-                <span>Call +91 91583 91519</span>
-              </Button>
-            </a>
-          </div>
+                <FileText className="w-5 h-5" />
+                {quoteCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#dc2626] text-white text-[10px] font-bold rounded-full h-5 min-w-5 px-1 flex items-center justify-center ring-2 ring-white">
+                    {quoteCount}
+                  </span>
+                )}
+              </Link>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500 space-y-1">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px]">
-                Licence No. 22000126-CLM
-              </Badge>
-              <Badge variant="outline" className="text-[10px]">
-                MSME Registered
-              </Badge>
+              <Link
+                href="/quote"
+                className="shine hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#1e5aa8] to-[#2563eb] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/25 transition-transform hover:-translate-y-0.5"
+              >
+                Get a Quote
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((v) => !v)}
+                className="lg:hidden p-2 rounded-full text-slate-700 hover:bg-slate-100"
+                aria-label="Toggle navigation menu"
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
-      )}
+
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="lg:hidden overflow-hidden border-t border-slate-100 bg-white"
+            >
+              <div className="px-4 pt-3 pb-6 space-y-1">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.03 * i }}
+                  >
+                    <Link
+                      href={link.href}
+                      className={cn(
+                        "flex items-center justify-between px-3 py-3 rounded-xl text-base font-semibold",
+                        isActive(link.href) ? "bg-blue-50 text-[#1e5aa8]" : "text-slate-800 hover:bg-slate-50"
+                      )}
+                    >
+                      {link.name}
+                      <ChevronRight className="w-4 h-4 text-slate-400" />
+                    </Link>
+                  </motion.div>
+                ))}
+                <div className="pt-4 grid grid-cols-2 gap-3">
+                  <Link
+                    href="/quote"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-[#1e5aa8] py-3 text-sm font-bold text-white"
+                  >
+                    <FileText className="w-4 h-4" /> Quote ({quoteCount})
+                  </Link>
+                  <a
+                    href={`tel:${CONTACT.office}`}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-800"
+                  >
+                    <Phone className="w-4 h-4 text-[#1e5aa8]" /> Call Office
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </header>
   );
 }

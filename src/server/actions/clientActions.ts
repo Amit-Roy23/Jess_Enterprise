@@ -19,7 +19,7 @@ export async function createClientAction(data: ClientInput) {
     await connectDB();
     await Client.create(validated.data);
     revalidatePath("/clients");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Client added successfully" };
   } catch (err) {
     console.error("Error creating client:", err);
@@ -32,10 +32,14 @@ export async function updateClientAction(id: string, data: Partial<ClientInput>)
     const session = await auth();
     if (!session?.user) return { success: false, message: "Unauthorized" };
 
+    const validated = clientSchema.partial().safeParse(data);
+    if (!validated.success) {
+      return { success: false, message: "Validation failed", errors: validated.error.flatten().fieldErrors };
+    }
     await connectDB();
-    await Client.findByIdAndUpdate(id, data);
+    await Client.findByIdAndUpdate(id, validated.data, { runValidators: true });
     revalidatePath("/clients");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Client updated successfully" };
   } catch (err) {
     console.error("Error updating client:", err);
@@ -51,7 +55,7 @@ export async function deleteClientAction(id: string) {
     await connectDB();
     await Client.findByIdAndDelete(id);
     revalidatePath("/clients");
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     return { success: true, message: "Client deleted successfully" };
   } catch (err) {
     console.error("Error deleting client:", err);

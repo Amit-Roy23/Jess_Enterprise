@@ -114,7 +114,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <span className="text-xs font-semibold text-slate-400">
-                    Mobile / WhatsApp
+                    Mobile
                   </span>
                   <a
                     href="tel:9158391519"
@@ -131,7 +131,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <span className="text-xs font-semibold text-slate-400">
-                    Office Landline
+                    Office / WhatsApp
                   </span>
                   <a
                     href="tel:9225901519"

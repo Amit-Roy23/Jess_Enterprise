@@ -40,7 +40,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     gstin: { type: String, default: "30AZCPG5317P1ZG" },
     udyam: { type: String, default: "UDYAM-GA-01-0024091 (Micro)" },
     socialLinks: {
-      whatsapp: { type: String, default: "https://wa.me/919158391519" },
+      whatsapp: { type: String, default: "https://wa.me/919225901519" },
       linkedin: { type: String, default: "" },
       facebook: { type: String, default: "" },
     },

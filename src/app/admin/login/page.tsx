@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,7 +10,9 @@ import { Button } from "@/components/ui/button";
 export default function AdminLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/admin";
+  // Only allow same-site redirects after login
+  const rawCallback = searchParams.get("callbackUrl") || "/admin";
+  const callbackUrl = rawCallback.startsWith("/") && !rawCallback.startsWith("//") ? rawCallback : "/admin";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,15 +45,18 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 sm:p-6 selection:bg-[#1e5aa8] selection:text-white">
+    <div className="min-h-screen bg-[#0b1f3a] bg-grid-light flex items-center justify-center p-4 sm:p-6 selection:bg-[#1e5aa8] selection:text-white">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 sm:p-10 border border-slate-100 space-y-8 animate-in fade-in zoom-in-95 duration-200">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1e5aa8]/10 text-[#1e5aa8] mb-2 font-black text-xl">
-            JE
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-            Jess Enterprises
-          </h1>
+          <Image
+            src="/brand/jess-logo-256.png"
+            alt="Jess Enterprises logo"
+            width={84}
+            height={84}
+            priority
+            className="mx-auto mb-2 rounded-full shadow-lg ring-4 ring-blue-50"
+          />
+          <h1 className="font-script text-5xl font-bold text-[#1e5aa8]">Jess Enterprises</h1>
           <p className="text-xs text-slate-500 font-medium">
             Management Portal & Enquiry Dispatch
           </p>
@@ -75,7 +81,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@jessenterprises.com"
+                placeholder="jess.enterprises14@gmail.com"
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-xs text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none focus:border-[#1e5aa8] focus:ring-2 focus:ring-[#1e5aa8]/20 transition-all"
               />
             </div>

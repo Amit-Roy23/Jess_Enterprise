@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, X, Filter, RotateCcw } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,15 @@ const VERTICAL_TABS = [
   { id: "fabrication", label: "Custom Fabrication" },
 ];
 
+/** Applies ?category= / ?vertical= / ?search= deep links (isolated so the grid itself still prerenders). */
+function SearchParamsSync({ onParams }: { onParams: (p: URLSearchParams) => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    onParams(new URLSearchParams(searchParams.toString()));
+  }, [searchParams, onParams]);
+  return null;
+}
+
 export function ProductGridFilter({
   initialProducts,
   categories,
@@ -44,6 +54,14 @@ export function ProductGridFilter({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedVertical, setSelectedVertical] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || "all");
+  const applyParams = React.useCallback((p: URLSearchParams) => {
+    const category = p.get("category");
+    const vertical = p.get("vertical");
+    const search = p.get("search");
+    if (category) setSelectedCategory(category);
+    if (vertical) setSelectedVertical(vertical);
+    if (search) setSearchQuery(search);
+  }, []);
 
   // Filtered categories based on active vertical
   const visibleCategories = useMemo(() => {
@@ -104,6 +122,9 @@ export function ProductGridFilter({
 
   return (
     <div className="space-y-8">
+      <Suspense fallback={null}>
+        <SearchParamsSync onParams={applyParams} />
+      </Suspense>
       {/* Search and Top Vertical Tabs */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-5">
         {/* Search Bar */}

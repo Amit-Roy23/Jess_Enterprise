@@ -1,7 +1,7 @@
 import React from "react";
 import { connectDB } from "@/lib/db";
 import { SiteSettings } from "@/models";
-import { SettingsForm } from "@/components/admin/SettingsForm";
+import { SettingsForm, type SiteSettingsData } from "@/components/admin/SettingsForm";
 
 export const metadata = {
   title: "Site Settings & Compliance | Jess Enterprises Admin",
@@ -9,30 +9,8 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-interface SiteSettingsDoc {
-  companyName: string;
-  tagline?: string;
-  phones?: {
-    whatsapp?: string;
-    office?: string;
-  };
-  email?: string;
-  address?: {
-    street?: string;
-    city?: string;
-    state?: string;
-    pincode?: string;
-    country?: string;
-  };
-  gstin?: string;
-  legalMetrologyLicence?: string;
-  googleMapsUrl?: string;
-  officeHours?: string;
-  quoteEmailRecipients?: string[];
-}
-
 export default async function AdminSettingsPage() {
-  let settings: SiteSettingsDoc | null = null;
+  let settings: SiteSettingsData | null = null;
 
   try {
     await connectDB();
@@ -43,7 +21,7 @@ export default async function AdminSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-2xl font-black text-slate-900 tracking-tight">
           Global Settings & Compliance Registrations

@@ -32,7 +32,7 @@ export async function createProductAction(data: ProductInput) {
 
     const product = await Product.create(validated.data);
 
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     revalidatePath("/products");
     revalidatePath(`/products/${product.slug}`);
 
@@ -50,16 +50,32 @@ export async function updateProductAction(id: string, data: Partial<ProductInput
       return { success: false, message: "Unauthorized" };
     }
 
+    const validated = productSchema.partial().safeParse(data);
+    if (!validated.success) {
+      return {
+        success: false,
+        message: "Validation failed",
+        errors: validated.error.flatten().fieldErrors,
+      };
+    }
+
     await connectDB();
     const product = await Product.findById(id);
     if (!product) {
       return { success: false, message: "Product not found" };
     }
 
-    Object.assign(product, data);
+    if (validated.data.slug && validated.data.slug !== product.slug) {
+      const clash = await Product.exists({ slug: validated.data.slug, _id: { $ne: product._id } });
+      if (clash) {
+        return { success: false, message: "A product with this slug already exists." };
+      }
+    }
+
+    Object.assign(product, validated.data);
     await product.save();
 
-    revalidatePath("/");
+    revalidatePath("/", "layout");
     revalidatePath("/products");
     revalidatePath(`/products/${product.slug}`);
 
@@ -81,7 +97,7 @@ export async function deleteProductAction(id: string) {
     const product = await Product.findByIdAndDelete(id);
 
     if (product) {
-      revalidatePath("/");
+      revalidatePath("/", "layout");
       revalidatePath("/products");
       revalidatePath(`/products/${product.slug}`);
     }

@@ -54,82 +54,71 @@ export function ProductCard({
   const primaryImage = images && images.length > 0 ? images[0] : null;
 
   return (
-    <div className="group flex flex-col justify-between bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-blue-300 transition-all duration-200">
-      {/* Top Image Container */}
-      <Link href={`/products/${slug}`} className="relative block overflow-hidden">
-        <div className="aspect-[4/3] w-full bg-slate-50 relative">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200/80 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-blue-900/10 hover:ring-blue-200">
+      <Link href={`/products/${slug}`} className="relative block overflow-hidden" tabIndex={-1}>
+        <div className="relative aspect-[4/3] w-full bg-gradient-to-br from-slate-50 to-blue-50/50">
           {primaryImage?.url ? (
             <Image
               src={primaryImage.url}
               alt={primaryImage.alt || name}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-contain p-3 mix-blend-multiply transition-transform duration-500 ease-out group-hover:scale-110"
             />
           ) : (
             <ProductPlaceholder categorySlug={categorySlug} name={name} />
           )}
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-          {/* Badges Overlay */}
-          <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">
+          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
             {categoryName && (
-              <Badge variant="primary" className="text-[10px] shadow-xs">
+              <Badge variant="primary" className="text-[10px] shadow-sm backdrop-blur">
                 {categoryName}
               </Badge>
             )}
             {needsReview && (
-              <Badge variant="warning" className="text-[10px] shadow-xs font-semibold">
-                Specs Pending Review
+              <Badge variant="warning" className="text-[10px] shadow-sm font-semibold">
+                Specs on request
               </Badge>
             )}
           </div>
         </div>
       </Link>
 
-      {/* Body Content */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
-        <div>
-          <Link href={`/products/${slug}`}>
-            <h3 className="text-base font-bold text-slate-900 group-hover:text-[#1e5aa8] transition-colors line-clamp-2 leading-snug">
-              {name}
-            </h3>
-          </Link>
+      <div className="flex flex-1 flex-col p-5">
+        <Link href={`/products/${slug}`}>
+          <h3 className="text-[15px] font-bold leading-snug text-slate-900 line-clamp-2 transition-colors group-hover:text-[#1e5aa8]">
+            {name}
+          </h3>
+        </Link>
 
-          {shortDescription && (
-            <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
-              {shortDescription}
-            </p>
-          )}
+        {shortDescription && (
+          <p className="mt-2 text-xs leading-relaxed text-slate-500 line-clamp-2">{shortDescription}</p>
+        )}
 
-          {/* Key Specs (2-3 items) */}
-          {specs && specs.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
-              {specs.slice(0, 3).map((spec, idx) => (
-                <div key={idx} className="flex items-start text-xs gap-1.5">
-                  <span className="text-slate-400 font-medium shrink-0">
-                    {spec.label}:
-                  </span>
-                  <span className="text-slate-700 font-semibold line-clamp-1">
-                    {spec.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {specs && specs.length > 0 && (
+          <ul className="mt-4 space-y-1.5 border-t border-dashed border-slate-200 pt-3">
+            {specs.slice(0, 2).map((spec, idx) => (
+              <li key={idx} className="flex items-start gap-1.5 text-xs">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#dc2626]" />
+                <span className="text-slate-400 shrink-0">{spec.label}:</span>
+                <span className="font-semibold text-slate-700 line-clamp-1">{spec.value}</span>
+              </li>
+            ))}
+          </ul>
+        )}
 
-        {/* Action Buttons */}
-        <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
+        <div className="mt-auto flex items-center gap-2 pt-5">
           <Button
             size="sm"
             variant={added ? "secondary" : "primary"}
-            className="flex-1 text-xs gap-1.5 font-semibold"
+            className="flex-1 gap-1.5 rounded-full text-xs font-semibold"
             onClick={handleAddToQuote}
           >
             {added ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700">Added to Quote</span>
+                <span className="text-emerald-700">Added</span>
               </>
             ) : (
               <>
@@ -139,15 +128,12 @@ export function ProductCard({
             )}
           </Button>
 
-          <Link href={`/products/${slug}`}>
-            <Button
-              size="sm"
-              variant="outline"
-              className="px-2.5 text-xs text-slate-700 hover:text-[#1e5aa8]"
-              aria-label={`View details for ${name}`}
-            >
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </Button>
+          <Link
+            href={`/products/${slug}`}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-all hover:border-[#1e5aa8] hover:bg-[#1e5aa8] hover:text-white group-hover:rotate-45"
+            aria-label={`View details for ${name}`}
+          >
+            <ArrowUpRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

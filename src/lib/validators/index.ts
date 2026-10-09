@@ -19,8 +19,14 @@ export const productSpecSchema = z.object({
   value: z.string().min(1, "Spec value is required"),
 });
 
+/** Absolute http(s) link (e.g. from Google Images) or a site path like /products/x.webp or /api/media/<id>. */
+export const imageUrlSchema = z
+  .string()
+  .trim()
+  .refine((v) => /^https?:\/\/\S+$/i.test(v) || /^\/(?!\/)\S*$/.test(v), "Valid image URL required");
+
 export const productImageSchema = z.object({
-  url: z.string().url("Valid image URL required"),
+  url: imageUrlSchema,
   publicId: z.string().optional().default(""),
   alt: z.string().optional().default(""),
 });
@@ -78,7 +84,7 @@ export type GalleryItemInput = z.input<typeof galleryItemSchema>;
 
 export const clientSchema = z.object({
   name: z.string().min(2, "Client name is required"),
-  logo: z.string().optional().default(""),
+  logo: imageUrlSchema.optional().or(z.literal("")).default(""),
   website: z.string().url("Invalid website URL").optional().or(z.literal("")),
   order: z.number().int().default(0),
   isActive: z.boolean().default(true),
@@ -147,7 +153,7 @@ export const siteSettingsSchema = z.object({
   udyam: z.string().default("UDYAM-GA-01-0024091 (Micro)"),
   socialLinks: z
     .object({
-      whatsapp: z.string().optional().default("https://wa.me/919158391519"),
+      whatsapp: z.string().optional().default("https://wa.me/919225901519"),
       linkedin: z.string().optional().default(""),
       facebook: z.string().optional().default(""),
     })

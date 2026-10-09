@@ -18,6 +18,11 @@ import { ServiceJsonLd, BreadcrumbsJsonLd } from "@/components/site/JsonLd";
 
 export const revalidate = 60;
 
+// Pages are rendered on first visit, then served from cache (ISR)
+export async function generateStaticParams() {
+  return [];
+}
+
 interface ServiceDetailPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -51,7 +56,7 @@ export default async function ServiceDetailPage({
   const allServices = await getServices();
   const otherServices = allServices.filter((s) => s.slug !== service.slug);
 
-  const whatsappUrl = `https://wa.me/919158391519?text=${encodeURIComponent(
+  const whatsappUrl = `https://wa.me/919225901519?text=${encodeURIComponent(
     `Hello Jess Enterprises, I would like to request service assistance regarding: ${service.title}`
   )}`;
 

@@ -1,5 +1,7 @@
 import dns from "dns";
 import mongoose from "mongoose";
+import { AdminUser, SiteSettings } from "@/models";
+import { runSeed, ensureAdminUser } from "@/lib/seed";
 
 try {
   dns.setServers(["8.8.8.8", "1.1.1.1"]);
@@ -30,7 +32,7 @@ if (!global.mongooseCache) {
 export async function connectDB(): Promise<typeof mongoose> {
   if (!MONGODB_URI) {
     throw new Error(
-      "Please define the MONGODB_URI environment variable inside .env.local"
+      "Please define the MONGODB_URI environment variable (e.g. in .env.local)"
     );
   }
 
@@ -44,9 +46,12 @@ export async function connectDB(): Promise<typeof mongoose> {
       maxPoolSize: 10,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
-      return mongooseInstance;
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, opts)
+      .then(async (mongooseInstance) => {
+        await bootstrapDatabase();
+        return mongooseInstance;
+      });
   }
 
   try {
@@ -57,6 +62,26 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 
   return cached.conn;
+}
+
+/**
+ * First-run bootstrap: on an empty database, load the full catalogue (products,
+ * clients, services, settings) and create the admin login, so a fresh MongoDB
+ * works without running `pnpm seed`. Never overwrites existing content.
+ */
+async function bootstrapDatabase() {
+  try {
+    const hasSettings = await SiteSettings.exists({});
+    if (!hasSettings) {
+      console.log("[db] Empty database detected — seeding default content...");
+      await runSeed();
+      console.log("[db] Default content seeded.");
+    } else if (!(await AdminUser.exists({}))) {
+      await ensureAdminUser();
+    }
+  } catch (err) {
+    console.error("[db] Bootstrap failed:", err);
+  }
 }
 
 export default connectDB;

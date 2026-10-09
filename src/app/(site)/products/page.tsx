@@ -12,20 +12,9 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-interface ProductsPageProps {
-  searchParams: Promise<{ category?: string; vertical?: string; search?: string }>;
-}
-
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const params = await searchParams;
-  const [products, categories] = await Promise.all([
-    getProducts({
-      categorySlug: params.category,
-      vertical: params.vertical,
-      search: params.search,
-    }),
-    getCategories(),
-  ]);
+// All products are loaded once (static + revalidated) and filtered instantly in the browser
+export default async function ProductsPage() {
+  const [products, categories] = await Promise.all([getProducts(), getCategories()]);
 
   return (
     <div className="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
@@ -45,11 +34,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       </div>
 
       {/* Interactive Filter and Grid Component */}
-      <ProductGridFilter
-        initialProducts={products}
-        categories={categories}
-        initialCategory={params.category}
-      />
+      <ProductGridFilter initialProducts={products} categories={categories} />
     </div>
   );
 }
