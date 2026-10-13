@@ -1048,3 +1048,32 @@ export const STOCK_PHOTOS: Record<string, string[]> = {
   "circulating-bath": ["Circulating_water_bath_2015.jpg"],
   "turbidity-meter": ["TurbidityStandards.jpg"],
 };
+
+/**
+ * Manufacturer (Labman Scientific) product pages with high-quality photos.
+ * The brochure specs match these models. The first page's main photo becomes the main image.
+ */
+const LABMAN = "https://www.labmanscientific.net/product-page/";
+export const SUPPLIER_PAGES: Record<string, string[]> = {
+  "nano-bio-spectrophotometer-spectrophotometer": [
+    `${LABMAN}luv2100t-uv-vis-double-beam-spectrophotometer-touchscreen`,
+    `${LABMAN}lmspv325-visible-single-beam-spectrophotometer`,
+  ],
+  "ion-ph-conductivity-tds-do-meter": [`${LABMAN}lmion40-ion-ph-meter`, `${LABMAN}lmph12-ph-meter-5-points`],
+  polarimeter: [`${LABMAN}adp45-automatic-digital-polarimeter`],
+  "refractometer-touch-screen": [`${LABMAN}lmar1317t-abbe-refractometer`],
+  viscometer: [`${LABMAN}lmdv100-digital-viscometer`, `${LABMAN}lmdv200-digital-viscometer`],
+  "ultrasonic-cleaner": [`${LABMAN}lmuc9d-ultrasonic-cleaner-degas-function`, `${LABMAN}lmuc12d-ultrasonic-cleaner-degas-function`],
+  "ice-flaker-ice-maker": [`${LABMAN}lmif50t-ice-flaker`, `${LABMAN}lmif100t-ice-flaker`],
+  "ceramic-magnetic-stirrer": [`${LABMAN}lmms300-hotplate-magnetic-stirrer`],
+  "magnetic-stirrers-various-types": [`${LABMAN}lobms5-oil-bath-magnetic-stirrer`, `${LABMAN}lmms300-hotplate-magnetic-stirrer`],
+  "digital-water-bath": [`${LABMAN}lmwb6h-waterbath-6holes`, `${LABMAN}lmwb8h-waterbath-8-holes`],
+  "melting-point-apparatus": [`${LABMAN}mpa3p-portable-melting-point-apparatus`],
+  "bod-incubator": [`${LABMAN}lmio6-mini-thermostatic-incubator`],
+  shakers: [`${LABMAN}osi480-benchtop-orbital-shaking-incubator`],
+  "nitrogen-gas-generator": [`${LABMAN}ggn303-nitrogen-generator`],
+  "hydrogen-gas-generator": [`${LABMAN}ggh302-hydrogen-generator`],
+  "zero-air-gas-generator": [`${LABMAN}gga200-air-generator`],
+  "circulating-bath": [`${LABMAN}rcb620t-refrigerated-circulating-bath`],
+  "turbidity-meter": [`${LABMAN}lmtb200-turbidity-meter`, `${LABMAN}lmtb5p-portable-turbidity-meter`],
+};
