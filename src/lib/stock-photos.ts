@@ -43,10 +43,11 @@ export interface StockPhotoResult {
  */
 export async function fillMissingStockPhotos(): Promise<StockPhotoResult[]> {
   const slugs = Object.keys(STOCK_PHOTOS);
-  const missing = await Product.find(
-    { slug: { $in: slugs }, $or: [{ images: { $size: 0 } }, { images: { $exists: false } }] },
-    { slug: 1, name: 1 }
-  ).lean();
+  // Products with no photo, or only a low-res brochure crop (/products/*.webp)
+  const candidates = await Product.find({ slug: { $in: slugs } }, { slug: 1, name: 1, images: 1 }).lean();
+  const missing = candidates.filter(
+    (p) => !p.images?.length || p.images.every((img) => img.url.startsWith("/products/"))
+  );
 
   const useCloudinary = cloudinaryConfigured();
 
@@ -73,7 +74,7 @@ export async function fillMissingStockPhotos(): Promise<StockPhotoResult[]> {
         }
 
         await Product.updateOne(
-          { _id: product._id, $or: [{ images: { $size: 0 } }, { images: { $exists: false } }] },
+          { _id: product._id },
           { $set: { images: [{ url: finalUrl, publicId, alt: `${product.name} (photo: Wikimedia Commons)` }] } }
         );
         return { slug: product.slug, status: "added", url: finalUrl };

@@ -1034,6 +1034,7 @@ export const GALLERY_IMAGES: Record<string, string[]> = {
  * Several candidates per product; the first one that downloads successfully is used.
  */
 export const STOCK_PHOTOS: Record<string, string[]> = {
+  polarimeter: ["Automatic_Polarimeter_with_Filling_Funnel.jpg", "140310_Polartronic_M202.jpg"],
   "density-meter-kit": ["Measuring_density.jpg"],
   "refractometer-touch-screen": ["Refractometre_ABBE_2009_jflm.jpg", "2020_Refraktometr.jpg"],
   "probe-sonicator": ["Ultrasonic_emulsification.jpg"],
@@ -1060,7 +1061,6 @@ export const SUPPLIER_PAGES: Record<string, string[]> = {
     `${LABMAN}lmspv325-visible-single-beam-spectrophotometer`,
   ],
   "ion-ph-conductivity-tds-do-meter": [`${LABMAN}lmion40-ion-ph-meter`, `${LABMAN}lmph12-ph-meter-5-points`],
-  polarimeter: [`${LABMAN}adp45-automatic-digital-polarimeter`],
   "refractometer-touch-screen": [`${LABMAN}lmar1317t-abbe-refractometer`],
   viscometer: [`${LABMAN}lmdv100-digital-viscometer`, `${LABMAN}lmdv200-digital-viscometer`],
   "ultrasonic-cleaner": [`${LABMAN}lmuc9d-ultrasonic-cleaner-degas-function`, `${LABMAN}lmuc12d-ultrasonic-cleaner-degas-function`],
