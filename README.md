@@ -157,7 +157,7 @@ Default administrator credentials (change the password from **Admin → Users** 
 3. Make sure Vercel's `MONGODB_URI` is **exactly** the one in your `.env.local` (same cluster *and* database
    name after `.mongodb.net/`), then redeploy. `pnpm seed` prints the database it wrote to.
 4. If `admins` is 0 or the password doesn't work, run `pnpm seed` — it resets the admin password and prints it.
-5. Admin → Dashboard → **"Load products & fetch missing photos"** adds any missing products and downloads
+5. Admin → Dashboard → **"Load products & HD photos"** adds any missing products and downloads HD manufacturer
    photos (stored in Cloudinary when configured) for products without one.
 
 If the database is unreachable, the public site still shows the full built-in catalogue, so visitors never

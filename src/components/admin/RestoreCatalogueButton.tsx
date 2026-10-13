@@ -13,8 +13,8 @@ export function RestoreCatalogueButton() {
       <div>
         <p className="text-sm font-bold text-slate-900">Default catalogue &amp; product photos</p>
         <p className="text-xs text-slate-500 mt-0.5">
-          Adds any missing brochure products and downloads photos for products that have none. Your edits are never
-          overwritten.
+          Adds any missing brochure products and replaces the low-resolution default photos with HD manufacturer
+          photos. Photos you uploaded yourself are never replaced.
         </p>
         {result && (
           <p className={`mt-2 text-xs flex items-center gap-1.5 ${result.success ? "text-emerald-700" : "text-red-700"}`}>
@@ -30,7 +30,7 @@ export function RestoreCatalogueButton() {
         className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#1e5aa8] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#173f76] disabled:opacity-60"
       >
         {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageDown className="w-4 h-4" />}
-        {isPending ? "Working… (up to a minute)" : "Load products & fetch missing photos"}
+        {isPending ? "Working… (up to a minute)" : "Load products & HD photos"}
       </button>
     </div>
   );

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { fillMissingStockPhotos } from "@/lib/stock-photos";
+import { fillMissingStockPhotos, importSupplierPhotos } from "@/lib/stock-photos";
 import bcrypt from "bcryptjs";
 import {
   Category,
@@ -199,7 +199,13 @@ export async function runSeed(opts: { resetAdminPassword?: boolean; stockPhotos?
 
   // 8. Download stock photos for products that still have none (needs internet)
   if (opts.stockPhotos === false) return;
-  console.log("Adding photos for products without one...");
+  console.log("Importing HD photos from the manufacturer (Labman Scientific)...");
+  const hd = await importSupplierPhotos();
+  console.log(`  ${hd.filter((p) => p.status === "added").length} products updated with HD photos.`);
+  const failedHd = hd.filter((p) => p.status === "failed").map((p) => p.slug);
+  if (failedHd.length) console.log(`  Could not fetch: ${failedHd.join(", ")}`);
+
+  console.log("Adding photos for products still without one...");
   const photos = await fillMissingStockPhotos();
   const added = photos.filter((p) => p.status === "added").length;
   if (photos.length) console.log(`  ${added}/${photos.length} product photos added.`);
