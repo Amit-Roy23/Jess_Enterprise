@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable jsx-a11y/alt-text -- alt is required by ImageProps and passed through */
 
 import React from "react";
 import Image, { type ImageLoaderProps, type ImageProps } from "next/image";
