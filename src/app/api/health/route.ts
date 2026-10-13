@@ -30,9 +30,10 @@ export async function GET() {
 
   try {
     await connectDB();
-    const [products, productsWithPhotos, categories, clients, admins] = await Promise.all([
+    const [products, productsWithPhotos, productsWithHdPhotos, categories, clients, admins] = await Promise.all([
       Product.countDocuments(),
       Product.countDocuments({ "images.0": { $exists: true } }),
+      Product.countDocuments({ "images.0.publicId": { $regex: "-hd-" } }),
       Category.countDocuments(),
       Client.countDocuments(),
       AdminUser.countDocuments(),
@@ -41,7 +42,7 @@ export async function GET() {
       {
         ok: true,
         database: { connected: true, name: mongoose.connection.name },
-        counts: { products, productsWithPhotos, categories, clients, admins },
+        counts: { products, productsWithPhotos, productsWithHdPhotos, categories, clients, admins },
         env,
       },
       { headers: { "Cache-Control": "no-store" } }

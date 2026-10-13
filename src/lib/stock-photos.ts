@@ -94,42 +94,63 @@ const BROWSER_UA =
 
 /** Full-resolution Wix media URL (strips the /v1/fit/... resize suffix). */
 function wixOriginal(url: string): string | null {
-  const m = url.match(/https:\/\/static\.wixstatic\.com\/media\/([A-Za-z0-9_%-]+~mv2\.(?:jpe?g|png|webp))/i);
+  const m = url.match(/https:\/\/static\.wixstatic\.com\/media\/([A-Za-z0-9_%~.-]+?\.(?:jpe?g|png|webp))/i);
   return m ? `https://static.wixstatic.com/media/${m[1]}` : null;
 }
 
-/** Main product photo (and up to `max - 1` extra gallery photos) from a Wix product page. */
-async function scrapeProductPhotos(pageUrl: string, max = 3): Promise<string[]> {
+type ScrapeResult = { photos: string[]; error?: string };
+
+/** Main product photo (and up to `max - 1` gallery photos) from a Wix product page. */
+async function scrapeProductPhotos(pageUrl: string, max = 3): Promise<ScrapeResult> {
   try {
     const res = await fetch(pageUrl, {
-      headers: { "User-Agent": BROWSER_UA, Accept: "text/html" },
-      signal: AbortSignal.timeout(15000),
+      headers: { "User-Agent": BROWSER_UA, Accept: "text/html,application/xhtml+xml", "Accept-Language": "en" },
+      signal: AbortSignal.timeout(12000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) return { photos: [], error: `page HTTP ${res.status}` };
     const html = await res.text();
 
     const found: string[] = [];
-    const add = (u: string | null) => {
-      if (u && !found.includes(u)) found.push(u);
+    const add = (u: string | null | undefined) => {
+      if (!u) return;
+      const clean = wixOriginal(u) || (/^https?:\/\//.test(u) ? u : null);
+      if (clean && !found.includes(clean)) found.push(clean);
     };
-    // og:image is the product's main photo
-    const og = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
-      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
-    if (og) add(wixOriginal(og[1]) || og[1]);
-    // Extra photos from the product's own gallery data (not logos/banners elsewhere on the page)
-    for (const m of html.matchAll(/"fullUrl"\s*:\s*"(https:\/\/static\.wixstatic\.com\/media\/[^"]+)"/gi)) {
-      if (found.length >= max) break;
-      add(wixOriginal(m[1]));
+
+    // 1. og:image = the product's main photo
+    const og =
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    add(og?.[1]);
+
+    // 2. JSON-LD Product "image"
+    for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+      try {
+        const data = JSON.parse(m[1]);
+        for (const node of Array.isArray(data) ? data : [data]) {
+          const img = node?.image;
+          const list = Array.isArray(img) ? img : [img];
+          for (const i of list) add(typeof i === "string" ? i : i?.contentUrl || i?.url);
+        }
+      } catch {
+        // ignore malformed JSON-LD
+      }
     }
-    return found.slice(0, max);
-  } catch {
-    return [];
+
+    // 3. Product gallery data (not logos/banners elsewhere on the page)
+    for (const m of html.matchAll(/"fullUrl"\s*:\s*"(https:\/\/static\.wixstatic\.com\/media\/[^"]+)"/gi)) {
+      add(m[1]);
+    }
+
+    return found.length ? { photos: found.slice(0, max) } : { photos: [], error: "no photo found on page" };
+  } catch (err) {
+    return { photos: [], error: err instanceof Error ? err.message : "fetch failed" };
   }
 }
 
 async function isImage(url: string): Promise<boolean> {
   try {
-    const res = await fetch(url, { headers: { "User-Agent": BROWSER_UA }, signal: AbortSignal.timeout(15000) });
+    const res = await fetch(url, { headers: { "User-Agent": BROWSER_UA }, signal: AbortSignal.timeout(12000) });
     const ok = res.ok && (res.headers.get("content-type") || "").startsWith("image/");
     await res.body?.cancel().catch(() => {});
     return ok;
@@ -144,65 +165,87 @@ function hasOnlyDefaultPhotos(images: { url: string; publicId?: string }[] = [])
     (img) =>
       img.url.startsWith("/products/") ||
       img.url.includes("upload.wikimedia.org") ||
-      (img.publicId || "").startsWith("jess_enterprises/products/")
+      (img.publicId || "").startsWith("jess_enterprises/products/") && !(img.publicId || "").includes("-hd-")
   );
+}
+
+export interface SupplierImportReport {
+  updated: string[];
+  failed: { slug: string; reason: string }[];
+  keptOwnPhotos: string[];
+  alreadyHd: string[];
+  remaining: number;
 }
 
 /**
  * Replaces the default low-resolution photos with the manufacturer's HD photos.
- * Photos the admin uploaded or pasted are never replaced.
+ * Photos the admin uploaded or pasted are never replaced. Stops starting new
+ * products after `budgetMs` so it fits in one serverless request; run it again
+ * to continue (finished products are skipped).
  */
-export async function importSupplierPhotos(): Promise<StockPhotoResult[]> {
+export async function importSupplierPhotos(budgetMs = 45000): Promise<SupplierImportReport> {
   const { SUPPLIER_PAGES } = await import("@/lib/catalogue-data");
-  const products = await Product.find({ slug: { $in: Object.keys(SUPPLIER_PAGES) } }, { slug: 1, name: 1, images: 1 }).lean();
+  const deadline = Date.now() + budgetMs;
+  const products = await Product.find(
+    { slug: { $in: Object.keys(SUPPLIER_PAGES) } },
+    { slug: 1, name: 1, images: 1 }
+  ).lean();
   const useCloudinary = cloudinaryConfigured();
 
-  const queue = products.filter((p) => hasOnlyDefaultPhotos(p.images));
-  const results: StockPhotoResult[] = products
-    .filter((p) => !queue.includes(p))
-    .map((p) => ({ slug: p.slug, status: "skipped" as const }));
+  const isHd = (imgs: { url: string; publicId?: string }[] = []) =>
+    imgs.length > 0 && imgs.every((i) => (i.publicId || "").includes("-hd-") || i.url.includes("wixstatic.com"));
 
-  // Small worker pool: polite to the supplier site and fits in one serverless request
+  const report: SupplierImportReport = { updated: [], failed: [], keptOwnPhotos: [], alreadyHd: [], remaining: 0 };
+  const queue: typeof products = [];
+  for (const p of products) {
+    if (isHd(p.images)) report.alreadyHd.push(p.slug);
+    else if (!hasOnlyDefaultPhotos(p.images)) report.keptOwnPhotos.push(p.slug);
+    else queue.push(p);
+  }
+
   const worker = async () => {
     for (let product = queue.shift(); product; product = queue.shift()) {
+      if (Date.now() > deadline) {
+        report.remaining++;
+        continue;
+      }
       const pages = SUPPLIER_PAGES[product.slug] || [];
       const urls: string[] = [];
-      for (const page of pages) {
-        for (const u of await scrapeProductPhotos(page, pages.length > 1 ? 2 : 3)) {
-          if (!urls.includes(u)) urls.push(u);
-        }
+      let lastError = "";
+      // Main page: main photo + 2 gallery photos; alternative models: main photo only
+      for (const [idx, page] of pages.entries()) {
+        const { photos, error } = await scrapeProductPhotos(page, idx === 0 ? 3 : 1);
+        if (error) lastError = error;
+        for (const u of photos) if (!urls.includes(u) && urls.length < 4) urls.push(u);
       }
 
       const images: { url: string; publicId: string; alt: string }[] = [];
-      for (const [i, remote] of urls.slice(0, 4).entries()) {
-        if (!(await isImage(remote))) continue;
-        let url = remote;
-        let publicId = "";
+      for (const [i, remote] of urls.entries()) {
         if (useCloudinary) {
           try {
             const up = await cloudinary.uploader.upload(remote, {
               folder: "jess_enterprises/products",
-              public_id: `${product.slug}-${i + 1}`,
+              public_id: `${product.slug}-hd-${i + 1}`,
               overwrite: true,
               transformation: [{ width: 1600, height: 1600, crop: "limit", quality: "auto" }],
             });
-            url = up.secure_url;
-            publicId = up.public_id;
+            images.push({ url: up.secure_url, publicId: up.public_id, alt: product.name });
           } catch (err) {
-            console.error(`[supplier-photos] Cloudinary upload failed for ${product.slug}:`, err);
+            lastError = `Cloudinary: ${err instanceof Error ? err.message : JSON.stringify(err)}`;
           }
+        } else if (await isImage(remote)) {
+          images.push({ url: remote, publicId: "", alt: product.name });
         }
-        images.push({ url, publicId, alt: product.name });
       }
 
       if (images.length === 0) {
-        results.push({ slug: product.slug, status: "failed" });
+        report.failed.push({ slug: product.slug, reason: lastError || "no photos" });
         continue;
       }
       await Product.updateOne({ _id: product._id }, { $set: { images } });
-      results.push({ slug: product.slug, status: "added", url: images[0].url });
+      report.updated.push(product.slug);
     }
   };
-  await Promise.all([worker(), worker(), worker(), worker()]);
-  return results;
+  await Promise.all(Array.from({ length: 6 }, worker));
+  return report;
 }

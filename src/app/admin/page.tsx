@@ -21,7 +21,7 @@ import RestoreCatalogueButton from "@/components/admin/RestoreCatalogueButton";
 
 export const revalidate = 0; // Dynamic dashboard
 // Photo import (server action on this page) may take a while
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 export default async function AdminDashboardPage() {
   const session = await auth();

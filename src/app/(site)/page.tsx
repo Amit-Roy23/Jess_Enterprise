@@ -25,6 +25,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/site/Reveal";
 import CountUp from "@/components/site/CountUp";
 import { getProducts, getClients, getSiteSettings } from "@/server/queries";
 import { CONTACT, whatsappLink } from "@/lib/contact";
+import { skipOptimization } from "@/lib/utils";
 
 export const revalidate = 60;
 
@@ -34,6 +35,7 @@ const VERTICALS = [
     badge: "Govt. Authorised",
     icon: Scale,
     image: "/products/precision-balance.webp",
+    productSlug: "balances-lab-industrial",
     href: "/services/legal-metrology-stamping",
     accent: "from-blue-600 to-[#1e5aa8]",
     points: [
@@ -48,6 +50,7 @@ const VERTICALS = [
     badge: "Sales & Service",
     icon: FlaskConical,
     image: "/products/spectrophotometer.webp",
+    productSlug: "nano-bio-spectrophotometer-spectrophotometer",
     href: "/products",
     accent: "from-sky-500 to-blue-600",
     points: [
@@ -62,6 +65,7 @@ const VERTICALS = [
     badge: "As per your spec",
     icon: Wrench,
     image: "/products/ss-vessel.webp",
+    productSlug: "ss-fabrication",
     href: "/fabrication",
     accent: "from-rose-500 to-[#dc2626]",
     points: [
@@ -98,6 +102,13 @@ export default async function HomePage() {
   // Show featured products with photos first
   const withPhotos = (list: typeof allProducts) =>
     [...list].sort((a, b) => Number(b.images?.length > 0) - Number(a.images?.length > 0));
+  // Home page photos come from the catalogue, so admin/HD photo updates show here too
+  const photoFor = (slug: string, fallback: string) =>
+    allProducts.find((p) => p.slug === slug)?.images?.[0]?.url || fallback;
+  const heroBalance = photoFor("balances-lab-industrial", "/products/precision-balance.webp");
+  const heroSpectro = photoFor("nano-bio-spectrophotometer-spectrophotometer", "/products/nano-spectrophotometer.webp");
+  const heroHplc = photoFor("hplc-column-storage-cabinet", "/products/hplc-cabinet.webp");
+
   const products = withPhotos(featured.length > 0 ? featured : allProducts).slice(0, 8);
 
   return (
@@ -177,21 +188,21 @@ export default async function HomePage() {
 
               <div className="absolute left-0 top-4 w-40 sm:w-48 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 animate-float">
                 <div className="relative aspect-[4/3]">
-                  <Image src="/products/precision-balance.webp" alt="Precision balance" fill sizes="200px" priority className="object-contain mix-blend-multiply" />
+                  <Image src={heroBalance} unoptimized={skipOptimization(heroBalance)} alt="Precision balance" fill sizes="200px" priority className="object-contain mix-blend-multiply" />
                 </div>
                 <p className="px-1 pb-1 text-[11px] font-bold text-slate-800">Lab &amp; Industrial Balances</p>
               </div>
 
               <div className="absolute right-0 top-16 w-40 sm:w-48 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 animate-float-delayed">
                 <div className="relative aspect-[4/3]">
-                  <Image src="/products/nano-spectrophotometer.webp" alt="Spectrophotometer" fill sizes="200px" className="object-contain mix-blend-multiply" />
+                  <Image src={heroSpectro} unoptimized={skipOptimization(heroSpectro)} alt="Spectrophotometer" fill sizes="200px" className="object-contain mix-blend-multiply" />
                 </div>
                 <p className="px-1 pb-1 text-[11px] font-bold text-slate-800">Spectrophotometers</p>
               </div>
 
               <div className="absolute bottom-2 left-8 w-40 sm:w-48 rounded-2xl bg-white p-2 shadow-2xl shadow-black/30 animate-float-delayed">
                 <div className="relative aspect-[4/3]">
-                  <Image src="/products/hplc-cabinet.webp" alt="HPLC column storage cabinet" fill sizes="200px" className="object-contain" />
+                  <Image src={heroHplc} unoptimized={skipOptimization(heroHplc)} alt="HPLC column storage cabinet" fill sizes="200px" className="object-contain" />
                 </div>
                 <p className="px-1 pb-1 text-[11px] font-bold text-slate-800">HPLC Column Cabinets</p>
               </div>
@@ -251,7 +262,8 @@ export default async function HomePage() {
                 >
                   <div className="relative h-52 overflow-hidden bg-gradient-to-br from-slate-50 to-blue-50">
                     <Image
-                      src={v.image}
+                      src={photoFor(v.productSlug, v.image)}
+                      unoptimized={skipOptimization(photoFor(v.productSlug, v.image))}
                       alt={v.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
