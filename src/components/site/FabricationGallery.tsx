@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { skipOptimization } from "@/lib/utils";
 import { Wrench, Eye, X, ArrowRight, FileUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import Image from "next/image";
+import React, { useState, useTransition, useEffect } from "react";
+import Image from "@/components/ui/SmartImage";
 import { useRouter } from "next/navigation";
 import { Plus, Edit2, Trash2, Save, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,10 @@ const MATERIALS: { value: MaterialGrade; label: string }[] = [
 export function GalleryManager({ initialItems }: GalleryManagerProps) {
   const router = useRouter();
   const [items, setItems] = useState<GalleryRow[]>(initialItems);
+  // Keep the list in sync when the server sends fresh data (after create/edit + router.refresh)
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryRow | null>(null);
 

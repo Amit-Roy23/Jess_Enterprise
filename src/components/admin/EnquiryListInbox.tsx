@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Eye,
@@ -46,6 +46,10 @@ const STATUS_TABS = [
 
 export function EnquiryListInbox({ initialEnquiries }: EnquiryListInboxProps) {
   const [enquiries, setEnquiries] = useState<EnquiryRow[]>(initialEnquiries);
+  // Keep the list in sync when the server sends fresh data (after create/edit + router.refresh)
+  useEffect(() => {
+    setEnquiries(initialEnquiries);
+  }, [initialEnquiries]);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");

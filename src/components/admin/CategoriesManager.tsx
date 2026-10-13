@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import Image from "next/image";
+import React, { useState, useTransition, useEffect } from "react";
+import Image from "@/components/ui/SmartImage";
 import { useRouter } from "next/navigation";
 import { Plus, Edit2, Trash2, FolderPlus, Save, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,10 @@ export function CategoriesManager({
 }: CategoriesManagerProps) {
   const router = useRouter();
   const [categories, setCategories] = useState<CategoryRow[]>(initialCategories);
+  // Keep the list in sync when the server sends fresh data (after create/edit + router.refresh)
+  useEffect(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryRow | null>(null);
 

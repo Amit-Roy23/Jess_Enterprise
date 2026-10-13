@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { Upload, X, Loader2, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

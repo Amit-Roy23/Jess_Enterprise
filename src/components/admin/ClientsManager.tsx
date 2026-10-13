@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import Image from "next/image";
+import React, { useState, useTransition, useEffect } from "react";
+import Image from "@/components/ui/SmartImage";
 import { useRouter } from "next/navigation";
 import { Plus, Edit2, Trash2, Building, Save, X, AlertCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,10 @@ interface ClientsManagerProps {
 export function ClientsManager({ initialClients }: ClientsManagerProps) {
   const router = useRouter();
   const [clients, setClients] = useState<ClientRow[]>(initialClients);
+  // Keep the list in sync when the server sends fresh data (after create/edit + router.refresh)
+  useEffect(() => {
+    setClients(initialClients);
+  }, [initialClients]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<ClientRow | null>(null);
 

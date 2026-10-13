@@ -163,6 +163,11 @@ Default administrator credentials (change the password from **Admin → Users** 
 If the database is unreachable, the public site still shows the full built-in catalogue, so visitors never
 see an empty page.
 
+### Admin panel speed
+Open `/api/health` and look at `performance.dbRoundTripMs`. If it is above ~80 ms, Vercel is running far from
+your database: in Vercel → **Settings → Functions → Function Region**, pick the region of your Atlas cluster
+(Atlas → Clusters shows it, e.g. *AWS Mumbai ap-south-1* → Vercel **Mumbai, bom1**), then redeploy.
+
 ### Images
 - Built-in product photos live in `public/products/`, client logos in `public/clients/`, the brand logo in `public/brand/`.
 - In the admin panel each product can have up to 6 photos: upload a file (auto-resized to WebP) or paste any image link (e.g. from Google Images).

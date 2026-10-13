@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn, skipOptimization } from "@/lib/utils";
 
