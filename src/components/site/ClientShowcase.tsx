@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import Image from "@/components/ui/SmartImage";
 import { Building2 } from "lucide-react";
 
 export interface ClientItem {

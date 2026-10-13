@@ -52,8 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         // Update last login timestamp
-        user.lastLoginAt = new Date();
-        await user.save();
+        await AdminUser.updateOne({ _id: user._id }, { $set: { lastLoginAt: new Date() } });
 
         return {
           id: user._id.toString(),

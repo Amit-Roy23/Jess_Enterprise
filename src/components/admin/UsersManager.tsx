@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Save, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,10 @@ interface UsersManagerProps {
 export function UsersManager({ initialUsers, currentUserId }: UsersManagerProps) {
   const router = useRouter();
   const [users, setUsers] = useState<UserRow[]>(initialUsers);
+  // Keep the list in sync when the server sends fresh data (after create/edit + router.refresh)
+  useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -91,7 +95,7 @@ export function UsersManager({ initialUsers, currentUserId }: UsersManagerProps)
       {/* Top Controls */}
       <div className="flex items-center justify-between">
         <p className="text-xs text-slate-500">
-          Showing <strong>{initialUsers.length}</strong> authorized admin users
+          Showing <strong>{users.length}</strong> authorized admin users
         </p>
         <Button
           size="sm"

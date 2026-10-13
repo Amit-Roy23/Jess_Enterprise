@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -41,6 +41,10 @@ interface ServicesManagerProps {
 export function ServicesManager({ initialServices }: ServicesManagerProps) {
   const router = useRouter();
   const [services, setServices] = useState<ServiceRow[]>(initialServices);
+  // Keep the list in sync when the server sends fresh data (after create/edit + router.refresh)
+  useEffect(() => {
+    setServices(initialServices);
+  }, [initialServices]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<ServiceRow | null>(null);
 

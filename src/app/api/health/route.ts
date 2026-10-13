@@ -28,8 +28,14 @@ export async function GET() {
     ),
   };
 
+  const region = process.env.VERCEL_REGION || "local";
   try {
+    const t0 = Date.now();
     await connectDB();
+    const connectMs = Date.now() - t0;
+    const t1 = Date.now();
+    await mongoose.connection.db?.admin().ping();
+    const pingMs = Date.now() - t1;
     const [products, productsWithPhotos, productsWithHdPhotos, categories, clients, admins] = await Promise.all([
       Product.countDocuments(),
       Product.countDocuments({ "images.0": { $exists: true } }),
@@ -42,6 +48,15 @@ export async function GET() {
       {
         ok: true,
         database: { connected: true, name: mongoose.connection.name },
+        performance: {
+          serverRegion: region,
+          dbRoundTripMs: pingMs,
+          connectMs,
+          tip:
+            pingMs > 80
+              ? "Each database call takes " + pingMs + " ms. Put Vercel's Function Region (Settings → Functions) in the same region as your Atlas cluster (e.g. Mumbai = bom1) to make the admin panel much faster."
+              : "Database latency is good.",
+        },
         counts: { products, productsWithPhotos, productsWithHdPhotos, categories, clients, admins },
         env,
       },
