@@ -200,10 +200,9 @@ export async function runSeed(opts: { resetAdminPassword?: boolean; stockPhotos?
   // 8. Download stock photos for products that still have none (needs internet)
   if (opts.stockPhotos === false) return;
   console.log("Importing HD photos from the manufacturer (Labman Scientific)...");
-  const hd = await importSupplierPhotos();
-  console.log(`  ${hd.filter((p) => p.status === "added").length} products updated with HD photos.`);
-  const failedHd = hd.filter((p) => p.status === "failed").map((p) => p.slug);
-  if (failedHd.length) console.log(`  Could not fetch: ${failedHd.join(", ")}`);
+  const hd = await importSupplierPhotos(10 * 60 * 1000);
+  console.log(`  ${hd.updated.length} updated with HD photos, ${hd.alreadyHd.length} already HD, ${hd.keptOwnPhotos.length} kept (your own photos).`);
+  for (const f of hd.failed) console.log(`  Could not fetch ${f.slug}: ${f.reason}`);
 
   console.log("Adding photos for products still without one...");
   const photos = await fillMissingStockPhotos();
