@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
             priority
             className="mx-auto mb-2 rounded-full shadow-lg ring-4 ring-blue-50"
           />
-          <h1 className="font-script text-5xl font-bold text-[#1e5aa8]">Jess Enterprises</h1>
+          <h1 className="font-script text-3xl text-[#1e5aa8]">Jess Enterprises</h1>
           <p className="text-xs text-slate-500 font-medium">
             Management Portal & Enquiry Dispatch
           </p>

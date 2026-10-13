@@ -132,7 +132,7 @@ export default async function HomePage() {
               </div>
 
               <h1 className="mt-6 animate-fade-up [animation-delay:120ms]">
-                <span className="block font-script font-bold text-[4.2rem] sm:text-[5.5rem] lg:text-[6.6rem] leading-[0.85] text-gradient-brand drop-shadow-sm">
+                <span className="block font-script text-[2.5rem] sm:text-[3.3rem] lg:text-[4rem] leading-[1.15] text-gradient-brand drop-shadow-sm">
                   Jess Enterprises
                 </span>
                 <span className="mt-4 block text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold tracking-tight leading-[1.15]">
@@ -244,7 +244,7 @@ export default async function HomePage() {
       <section className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <Reveal className="text-center max-w-2xl mx-auto mb-14">
-            <p className="font-script text-5xl font-bold text-[#dc2626]">What we do</p>
+            <p className="font-script text-2xl sm:text-3xl text-[#dc2626]">What we do</p>
             <h2 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
               Three verticals. One trusted partner.
             </h2>
@@ -301,7 +301,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto">
           <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="max-w-2xl">
-              <p className="font-script text-5xl font-bold text-[#dc2626]">Sales products</p>
+              <p className="font-script text-2xl sm:text-3xl text-[#dc2626]">Sales products</p>
               <h2 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                 Instruments trusted by leading labs
               </h2>
@@ -366,7 +366,7 @@ export default async function HomePage() {
       {/* ================= CLIENTS ================= */}
       <section className="py-20 lg:py-24 bg-slate-50 overflow-hidden">
         <Reveal className="text-center max-w-2xl mx-auto mb-12 px-4">
-          <p className="font-script text-5xl font-bold text-[#dc2626]">Our precious customers</p>
+          <p className="font-script text-2xl sm:text-3xl text-[#dc2626]">Our precious customers</p>
           <h2 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
             Trusted by pharma, research &amp; industry
           </h2>
@@ -383,7 +383,7 @@ export default async function HomePage() {
       <section className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
           <Reveal x={-30} y={0}>
-            <p className="font-script text-5xl font-bold text-[#dc2626]">Why Jess?</p>
+            <p className="font-script text-2xl sm:text-3xl text-[#dc2626]">Why Jess?</p>
             <h2 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
               Precision you can certify. Service you can count on.
             </h2>
@@ -466,7 +466,7 @@ export default async function HomePage() {
           <div className="absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-sky-400/30 blur-3xl animate-blob" aria-hidden="true" />
           <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             <div className="lg:col-span-2">
-              <p className="font-script text-5xl font-bold text-sky-200">Let&apos;s work together</p>
+              <p className="font-script text-2xl sm:text-3xl text-sky-200">Let&apos;s work together</p>
               <h2 className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-tight">
                 Feel free to contact us any time.
               </h2>

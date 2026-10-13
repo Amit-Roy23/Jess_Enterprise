@@ -10,9 +10,9 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { mark: 40, text: "text-[1.9rem]", tag: "text-[9px]" },
-  md: { mark: 50, text: "text-[2.35rem]", tag: "text-[10px]" },
-  lg: { mark: 64, text: "text-[2.9rem]", tag: "text-[11px]" },
+  sm: { mark: 40, text: "text-[1.1rem]", tag: "text-[9px]" },
+  md: { mark: 50, text: "text-[1.35rem]", tag: "text-[10px]" },
+  lg: { mark: 64, text: "text-[1.7rem]", tag: "text-[11px]" },
 };
 
 export function Logo({ className, variant = "default", size = "md" }: LogoProps) {
@@ -45,7 +45,7 @@ export function Logo({ className, variant = "default", size = "md" }: LogoProps)
       <span className="flex flex-col leading-none">
         <span
           className={cn(
-            "font-script font-bold whitespace-nowrap -mb-0.5",
+            "font-script whitespace-nowrap mb-0.5",
             s.text,
             isLight ? "text-white" : "text-[#1e5aa8]"
           )}
