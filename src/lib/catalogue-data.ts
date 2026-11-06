@@ -1002,7 +1002,7 @@ export const PRODUCT_IMAGES: Record<string, string[]> = {
   "ss-fabrication": ["ss-vessel", "ss-ring-stand", "ss-trolley", "ss-table", "ss-cabinet", "ss-stand", "ss-holder"],
   "ms-fabrication": ["drum-trolley"],
   "acrylic-fabrication": ["acrylic-cabinet"],
-  "hplc-column-storage-cabinet": ["hplc-cabinet", "hplc-drawer"],
+  "hplc-column-storage-cabinet": ["hplc-cabinet", "hplc-drawer", "hplc-chart-paper-roll", "hplc-sealed-vial", "hplc-ptfe-caps"],
   "anti-vibration-pad-balance-table": ["anti-vibration-table"],
   "balance-printer": ["balance-printer"],
 };
@@ -1091,6 +1091,10 @@ export const SUPPLIER_PAGES: Record<string, string[]> = {
  * Photos added after a site's first setup. Applied to existing databases by
  * `addCatalogueExtras()` (seed + admin dashboard button); each is added once.
  */
-export const EXTRA_PRODUCT_PHOTOS: { slug: string; file: string; alt: string }[] = [
-  { slug: "ss-fabrication", file: "ss-ring-stand", alt: "SS stand with rubber-cushioned ring holder" },
+export const EXTRA_PRODUCT_PHOTOS: { slug: string; file: string; alt: string; position?: number }[] = [
+  { slug: "ss-fabrication", file: "ss-ring-stand", alt: "SS stand with rubber-cushioned ring holder", position: 1 },
+  // Appended after the existing cabinet photos (no position)
+  { slug: "hplc-column-storage-cabinet", file: "hplc-chart-paper-roll", alt: "Chart recorder paper roll" },
+  { slug: "hplc-column-storage-cabinet", file: "hplc-sealed-vial", alt: "Sealed glass vial with flip-off cap" },
+  { slug: "hplc-column-storage-cabinet", file: "hplc-ptfe-caps", alt: "Machined PTFE (Teflon) caps and discs" },
 ];

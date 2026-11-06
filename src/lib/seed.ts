@@ -42,7 +42,12 @@ export async function addCatalogueExtras(): Promise<number> {
     const res = await Product.updateOne(
       { slug: extra.slug, "images.url": { $ne: url }, seededExtras: { $ne: marker } },
       {
-        $push: { images: { $each: [{ url, publicId: "", alt: extra.alt }], $position: 1 } },
+        $push: {
+          images: {
+            $each: [{ url, publicId: "", alt: extra.alt }],
+            ...(extra.position !== undefined ? { $position: extra.position } : {}),
+          },
+        },
         $addToSet: { seededExtras: marker },
       }
     );
