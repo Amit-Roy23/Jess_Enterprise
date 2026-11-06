@@ -19,6 +19,7 @@ import {
   PRODUCT_IMAGES,
   CLIENT_LOGOS,
   GALLERY_IMAGES,
+  EXTRA_PRODUCT_PHOTOS,
 } from "@/lib/catalogue-data";
 
 /**
@@ -27,6 +28,42 @@ import {
  */
 export const DEFAULT_ADMIN_EMAIL = "jess.enterprises14@gmail.com";
 export const DEFAULT_ADMIN_PASSWORD = "Jess@Admin2026";
+
+/**
+ * Adds photos and gallery projects introduced after the site was first set up,
+ * without touching anything else. Returns how many items were added.
+ */
+export async function addCatalogueExtras(): Promise<number> {
+  let added = 0;
+  for (const extra of EXTRA_PRODUCT_PHOTOS) {
+    const url = `/products/${extra.file}.webp`;
+    // Only if this photo has never been added (so deleting it in the admin sticks)
+    const marker = `extra:${extra.file}`;
+    const res = await Product.updateOne(
+      { slug: extra.slug, "images.url": { $ne: url }, seededExtras: { $ne: marker } },
+      {
+        $push: { images: { $each: [{ url, publicId: "", alt: extra.alt }], $position: 1 } },
+        $addToSet: { seededExtras: marker },
+      }
+    );
+    added += res.modifiedCount;
+  }
+  for (const item of galleryData) {
+    const photos = GALLERY_IMAGES[item.title];
+    const res = await GalleryItem.updateOne(
+      { title: item.title },
+      {
+        $setOnInsert: {
+          ...item,
+          images: (photos || []).map((f) => ({ url: `/products/${f}.webp`, alt: item.title })),
+        },
+      },
+      { upsert: true }
+    );
+    added += res.upsertedCount;
+  }
+  return added;
+}
 
 /** The admin login the seed creates (env vars override the defaults). */
 export function getAdminCredentials() {
@@ -197,7 +234,10 @@ export async function runSeed(opts: { resetAdminPassword?: boolean; stockPhotos?
   }
 
 
-  // 8. Download stock photos for products that still have none (needs internet)
+  // 8. Photos / projects added after first setup
+  await addCatalogueExtras();
+
+  // 9. Download stock photos for products that still have none (needs internet)
   if (opts.stockPhotos === false) return;
   console.log("Importing HD photos from the manufacturer (Labman Scientific)...");
   const hd = await importSupplierPhotos(10 * 60 * 1000);

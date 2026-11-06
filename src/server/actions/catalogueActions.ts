@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
-import { runSeed } from "@/lib/seed";
+import { runSeed, addCatalogueExtras } from "@/lib/seed";
 import { importSupplierPhotos, fillMissingStockPhotos } from "@/lib/stock-photos";
 import { productsData } from "@/lib/catalogue-data";
 import { Product } from "@/models";
@@ -26,12 +26,14 @@ export async function restoreCatalogueAction() {
       await runSeed({ stockPhotos: false });
     }
 
+    const extras = await addCatalogueExtras();
     const hd = await importSupplierPhotos(40000);
     const stock = hd.remaining === 0 ? await fillMissingStockPhotos() : [];
 
     revalidatePath("/", "layout");
 
     const parts = [
+      extras ? `${extras} new photos/projects added` : "",
       `${hd.updated.length} products updated with HD photos`,
       hd.alreadyHd.length ? `${hd.alreadyHd.length} already HD` : "",
       hd.keptOwnPhotos.length ? `${hd.keptOwnPhotos.length} kept your own photos` : "",
