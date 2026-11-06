@@ -1,10 +1,11 @@
 import React from "react";
+import { SITE_URL } from "@/lib/site";
 
 interface OrganizationJsonLdProps {
   url?: string;
 }
 
-export function OrganizationJsonLd({ url = "https://jessenterprises.in" }: OrganizationJsonLdProps) {
+export function OrganizationJsonLd({ url = SITE_URL }: OrganizationJsonLdProps) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -89,7 +90,7 @@ export function ProductJsonLd({
   slug,
   category,
 }: ProductJsonLdProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in";
+  const baseUrl = SITE_URL;
 
   const schema = {
     "@context": "https://schema.org",
@@ -131,7 +132,7 @@ interface ServiceJsonLdProps {
 }
 
 export function ServiceJsonLd({ title, description, slug }: ServiceJsonLdProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in";
+  const baseUrl = SITE_URL;
 
   const schema = {
     "@context": "https://schema.org",
@@ -165,7 +166,7 @@ interface BreadcrumbItem {
 }
 
 export function BreadcrumbsJsonLd({ items }: { items: BreadcrumbItem[] }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in";
+  const baseUrl = SITE_URL;
 
   const schema = {
     "@context": "https://schema.org",

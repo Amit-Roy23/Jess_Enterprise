@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { connectDB } from "@/lib/db";
 import { Product, Service } from "@/models";
+import { SITE_URL } from "@/lib/site";
 
 interface SlugDoc {
   slug: string;
@@ -8,7 +9,7 @@ interface SlugDoc {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in";
+  const baseUrl = SITE_URL;
 
   // Static site routes
   const staticRoutes: MetadataRoute.Sitemap = [
