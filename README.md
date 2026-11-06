@@ -163,6 +163,16 @@ Default administrator credentials (change the password from **Admin → Users** 
 If the database is unreachable, the public site still shows the full built-in catalogue, so visitors never
 see an empty page.
 
+### Custom domain (jesssenterprise.com)
+1. Vercel → Project → Settings → **Domains** → add `jesssenterprise.com` (and `www.jesssenterprise.com`,
+   redirected to the apex). Vercel shows the DNS records to create.
+2. Hostinger → Domains → jesssenterprise.com → **DNS / Nameservers → DNS records**: remove the parking
+   `A`/`AAAA`/`CNAME` records for `@` and `www`, then add the `A` (for `@`) and `CNAME` (for `www`) records
+   exactly as Vercel shows them. Wait until Vercel shows "Valid Configuration" (SSL is automatic).
+3. Only then set `NEXT_PUBLIC_APP_URL=https://jesssenterprise.com` in Vercel → Environment Variables
+   (Production) and redeploy. SEO tags, sitemap and robots.txt use it, and production traffic on
+   `*.vercel.app` is permanently redirected to the domain. Do **not** set `NEXTAUTH_URL`/`AUTH_URL` on Vercel.
+
 ### Admin panel speed
 Open `/api/health` and look at `performance.dbRoundTripMs`. If it is above ~80 ms, Vercel is running far from
 your database: in Vercel → **Settings → Functions → Function Region**, pick the region of your Atlas cluster

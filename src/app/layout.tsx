@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { brandScript, jakarta } from "@/lib/fonts";
+import { SITE_URL } from "@/lib/site";
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in";
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

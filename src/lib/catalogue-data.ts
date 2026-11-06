@@ -914,6 +914,14 @@ export const clientsList = [
 
 export const galleryData = [
   {
+    title: "SS Stand with Rubber-Cushioned Ring Holder",
+    material: "SS",
+    description:
+      "Stainless steel tubular stand with a double ring holder, padded with rubber cushioning to cradle round-bottom vessels, carboys and containers safely. Custom-built to the customer's size.",
+    order: 0,
+    isActive: true,
+  },
+  {
     title: "Cleanroom SS 316 Storage Vessel with Mobile Stand",
     material: "SS",
     description:
@@ -991,10 +999,10 @@ export const PRODUCT_IMAGES: Record<string, string[]> = {
   "e1-e2-f1-f2-class-weights": ["weights-set", "weights-case", "mg-weights"],
   "magnetic-stirrers-various-types": ["hot-plate-stirrer"],
   shakers: ["tube-roller-shaker"],
-  "ss-fabrication": ["ss-vessel", "ss-trolley", "ss-table", "ss-cabinet", "ss-stand", "ss-holder"],
+  "ss-fabrication": ["ss-vessel", "ss-ring-stand", "ss-trolley", "ss-table", "ss-cabinet", "ss-stand", "ss-holder"],
   "ms-fabrication": ["drum-trolley"],
   "acrylic-fabrication": ["acrylic-cabinet"],
-  "hplc-column-storage-cabinet": ["hplc-cabinet", "hplc-drawer"],
+  "hplc-column-storage-cabinet": ["hplc-cabinet", "hplc-drawer", "hplc-chart-paper-roll", "hplc-sealed-vial", "hplc-ptfe-caps"],
   "anti-vibration-pad-balance-table": ["anti-vibration-table"],
   "balance-printer": ["balance-printer"],
 };
@@ -1021,6 +1029,7 @@ export const CLIENT_LOGOS: Record<string, string> = {
 };
 
 export const GALLERY_IMAGES: Record<string, string[]> = {
+  "SS Stand with Rubber-Cushioned Ring Holder": ["ss-ring-stand"],
   "Cleanroom SS 316 Storage Vessel with Mobile Stand": ["ss-vessel", "ss-stand"],
   "Stainless Steel Heavy-Duty Drum Trolley": ["drum-trolley", "ss-trolley"],
   "Heavy-Duty MS Machine Structural Frame": ["ss-table"],
@@ -1077,3 +1086,15 @@ export const SUPPLIER_PAGES: Record<string, string[]> = {
   "circulating-bath": [`${LABMAN}rcb620t-refrigerated-circulating-bath`],
   "turbidity-meter": [`${LABMAN}lmtb200-turbidity-meter`, `${LABMAN}lmtb5p-portable-turbidity-meter`],
 };
+
+/**
+ * Photos added after a site's first setup. Applied to existing databases by
+ * `addCatalogueExtras()` (seed + admin dashboard button); each is added once.
+ */
+export const EXTRA_PRODUCT_PHOTOS: { slug: string; file: string; alt: string; position?: number }[] = [
+  { slug: "ss-fabrication", file: "ss-ring-stand", alt: "SS stand with rubber-cushioned ring holder", position: 1 },
+  // Appended after the existing cabinet photos (no position)
+  { slug: "hplc-column-storage-cabinet", file: "hplc-chart-paper-roll", alt: "Chart recorder paper roll" },
+  { slug: "hplc-column-storage-cabinet", file: "hplc-sealed-vial", alt: "Sealed glass vial with flip-off cap" },
+  { slug: "hplc-column-storage-cabinet", file: "hplc-ptfe-caps", alt: "Machined PTFE (Teflon) caps and discs" },
+];

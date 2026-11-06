@@ -27,6 +27,22 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * Once NEXT_PUBLIC_APP_URL is set to the custom domain (e.g. https://jesssenterprise.com),
+ * production traffic arriving on *.vercel.app is permanently redirected there, so
+ * Google only indexes one address. Not active for previews or when the variable is unset.
+ */
+const canonicalUrl = (process.env.NEXT_PUBLIC_APP_URL || "").trim().replace(/\/+$/, "");
+const canonicalHost = (() => {
+  try {
+    return new URL(canonicalUrl).host;
+  } catch {
+    return "";
+  }
+})();
+const redirectVercelHost =
+  process.env.VERCEL_ENV === "production" && canonicalHost && !canonicalHost.endsWith(".vercel.app");
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
@@ -42,6 +58,17 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
+  async redirects() {
+    if (!redirectVercelHost) return [];
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "(?<sub>.*)\\.vercel\\.app" }],
+        destination: `${canonicalUrl}/:path*`,
+        permanent: true,
+      },
+    ];
   },
   async headers() {
     return [

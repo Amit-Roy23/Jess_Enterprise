@@ -33,6 +33,8 @@ export interface IProduct extends Document {
   needsReview: boolean;
   order: number;
   seo?: IProductSeo;
+  /** Default photos already added once by addCatalogueExtras() */
+  seededExtras?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,6 +82,7 @@ const ProductSchema = new Schema<IProduct>(
     needsReview: { type: Boolean, default: false, index: true },
     order: { type: Number, default: 0 },
     seo: { type: ProductSeoSchema, default: () => ({}) },
+    seededExtras: { type: [String], default: undefined, select: false },
   },
   { timestamps: true }
 );

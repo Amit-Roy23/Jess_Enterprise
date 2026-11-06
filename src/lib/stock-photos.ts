@@ -1,8 +1,9 @@
 import { Product } from "@/models";
 import { STOCK_PHOTOS } from "@/lib/catalogue-data";
 import { cloudinary } from "@/lib/cloudinary";
+import { SITE_URL } from "@/lib/site";
 
-const USER_AGENT = `JessEnterprisesWebsite/1.0 (+${process.env.NEXT_PUBLIC_APP_URL || "https://jessenterprises.in"})`;
+const USER_AGENT = `JessEnterprisesWebsite/1.0 (+${SITE_URL})`;
 
 function cloudinaryConfigured() {
   return Boolean(
